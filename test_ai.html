@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Teaching Assistant - Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-bottom: 20px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .box {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            min-height: 50px;
+            text-align: left;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #7f8c8d;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .loader {
+            display: none;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>AI Teaching Assistant</h1>
+        <p>Click the button and ask a question!</p>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;">
+            <input type="text" id="textInput" placeholder="Type your question..."
+                style="padding: 10px; border-radius: 20px; border: 1px solid #ccc; width: 60%;">
+            <button id="sendBtn" style="margin-bottom: 0;">Send</button>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
+            <button id="micBtn">🎤 Start Listening</button>
+            <button id="clearBtn" style="background-color: #e74c3c;">🔄 New Chat</button>
+        </div>
+        <div class="loader" id="loader"></div>
+
+        <div class="box">
+            <div class="label">You said:</div>
+            <div id="transcriptText">...</div>
+        </div>
+
+        <div class="box">
+            <div class="label">AI says:</div>
+            <div id="aiResponseText">...</div>
+            <button id="replayBtn" style="display: none; margin-top: 15px; background-color: #27ae60; padding: 8px 15px; font-size: 14px;">🔊 Replay Audio</button>
+        </div>
+    </div>
+
+    <script>
+        const HF_TOKEN = "YOUR_HF_TOKEN";
+        const API_URL = "https://router.huggingface.co/v1/chat/completions";
+        const MODEL = "meta-llama/Llama-4-Scout-17B-16E-Instruct";
+        const GROQ_TOKEN = "YOUR_GROQ_TOKEN";
+        const GROQ_TTS_URL = "https://api.groq.com/openai/v1/audio/speech";
+        const SARVAM_KEY = "YOUR_SARVAM_KEY";
+        const SARVAM_TTS_URL = "https://api.sarvam.ai/text-to-speech";
+        let currentAudio = null; // track current audio so we can stop it
+
+        const micBtn = document.getElementById('micBtn');
+        const textInput = document.getElementById('textInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const transcriptText = document.getElementById('transcriptText');
+        const aiResponseText = document.getElementById('aiResponseText');
+        const replayBtn = document.getElementById('replayBtn');
+        const loader = document.getElementById('loader');
+
+        // Replay button logic
+        replayBtn.addEventListener('click', () => {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+                currentAudio.play();
+            }
+        });
+
+        // Session memory — stores conversation history (last 10 exchanges)
+        let conversationHistory = [];
+        const MAX_HISTORY = 25; // max user+assistant message pairs to remember
+
+        clearBtn.addEventListener('click', () => {
+            conversationHistory = [];
+            transcriptText.innerText = '...';
+            aiResponseText.innerText = 'Chat cleared! Ask me anything.';
+            textInput.value = '';
+        });
+
+        // Send button handler
+        sendBtn.addEventListener('click', async () => {
+            const val = textInput.value.trim();
+            if (!val) return;
+            transcriptText.innerText = val;
+            textInput.value = '';
+            loader.style.display = 'block';
+            replayBtn.style.display = 'none'; // hide replay while thinking
+            await fetchAIResponse(val);
+        });
+
+        // Enter key handler
+        textInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') sendBtn.click();
+        });
+
+        // Setup Speech Recognition
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert("Sorry, your browser does not support speech recognition. Please use Chrome.");
+        } else {
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-IN';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            micBtn.addEventListener('click', () => {
+                recognition.start();
+                micBtn.innerText = "Listening...";
+                micBtn.disabled = true;
+                transcriptText.innerText = "...";
+                aiResponseText.innerText = "...";
+                replayBtn.style.display = 'none'; // hide replay while listening
+            });
+
+            recognition.onresult = async (event) => {
+                const speechResult = event.results[0][0].transcript;
+                transcriptText.innerText = speechResult;
+                micBtn.innerText = "Thinking...";
+                loader.style.display = 'block';
+                await fetchAIResponse(speechResult);
+            };
+
+            recognition.onspeechend = () => {
+                recognition.stop();
+            };
+
+            recognition.onerror = (event) => {
+                micBtn.innerText = "🎤 Start Listening";
+                micBtn.disabled = false;
+                transcriptText.innerText = "Error: " + event.error;
+            };
+        }
+
+        async function fetchAIResponse(prompt) {
+            try {
+                const systemPrompt = `You are "CDF Guru" — an AI teaching assistant built by Connecting Dreams Foundation for students of the Haryana Board (HBSE/BSEH), covering Classes 1 to 12 and ALL subjects including Science, Maths, English, Hindi, Social Studies (History, Geography, Civics, Economics), Sanskrit, Computer Science, and more.
+
+IDENTITY & ROLE:
+- You are a patient, encouraging, and friendly teacher who makes learning fun.
+- You follow the HBSE (Board of School Education, Haryana) curriculum and NCERT/SCERT Haryana syllabus.
+- When a student mentions a class or subject, tailor your explanation to that exact grade level. A Class 3 student gets simpler language than a Class 10 student.
+- If the student does not mention their class, ask them once so you can adjust your teaching level.
+
+TEACHING STYLE:
+- Always start with a simple real-life example before diving into the concept.
+- Break complex topics into small, digestible steps.
+- Use analogies that relate to everyday life in Haryana and India (local context like farming, festivals, weather, cricket, etc.).
+- For Maths, show step-by-step solutions.
+- For Science, explain the "why" behind things, not just definitions.
+- For Social Studies, connect historical events to modern relevance.
+- For English/Hindi, help with grammar, comprehension, essay writing, and vocabulary.
+- Encourage the student after every answer. Be warm and supportive.
+
+LANGUAGE RULES (FOLLOW STRICTLY):
+1. If the user writes in English or asks for English, respond ONLY in pure English. No Hindi words.
+2. If the user writes in Hindi or asks for Hindi, respond ONLY in pure Hindi (Devanagari script).
+3. If the user writes in Hinglish or asks for Hinglish, respond in Hinglish (casual mix of Hindi and English in English script).
+4. If the user does not specify, match the language of their message.
+
+BOUNDARIES:
+- Only answer academic and educational questions related to the school syllabus.
+- If asked about non-academic topics (politics, violence, inappropriate content), politely redirect: "Yaar, main sirf padhai mein help kar sakta hoon! Koi subject ka doubt ho toh zaroor pucho."
+- Do NOT make up facts. If unsure, say so honestly.
+
+FORMAT:
+- Keep responses concise and clear (under 200 words unless the student asks for a detailed explanation).
+- Do NOT use markdown formatting (no **, no ##, no bullet symbols). Use plain text only so it can be spoken aloud clearly.
+- Number steps when explaining procedures (1, 2, 3...).`;
+
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${HF_TOKEN}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: MODEL,
+                        messages: [
+                            { role: "system", content: systemPrompt },
+                            ...conversationHistory,
+                            { role: "user", content: prompt }
+                        ],
+                        max_tokens: 300,
+                        temperature: 0.7
+                    })
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(`API Error ${response.status}: ${errData.error?.message || response.statusText}`);
+                }
+
+                const data = await response.json();
+                let aiText = data.choices[0].message.content.trim();
+
+                // Save this exchange to memory
+                conversationHistory.push({ role: "user", content: prompt });
+                conversationHistory.push({ role: "assistant", content: aiText });
+
+                // Keep only the last MAX_HISTORY pairs (20 messages)
+                if (conversationHistory.length > MAX_HISTORY * 2) {
+                    conversationHistory = conversationHistory.slice(-MAX_HISTORY * 2);
+                }
+
+                aiResponseText.innerText = aiText;
+                speakText(aiText);
+
+            } catch (error) {
+                console.error(error);
+                aiResponseText.innerText = "Error reaching AI: " + error.message;
+            } finally {
+                micBtn.innerText = "🎤 Start Listening";
+                micBtn.disabled = false;
+                loader.style.display = 'none';
+            }
+        }
+
+        async function speakText(text) {
+            // Stop any currently playing audio
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+            speechSynthesis.cancel();
+
+            aiResponseText.innerText = text + "\n\n\ud83d\udd0a Generating voice...";
+            
+            // Route everything to Groq Orpheus as requested
+            await useOrpheus(text);
+        }
+
+        async function useOrpheus(text) {
+            try {
+                const response = await fetch(GROQ_TTS_URL, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${GROQ_TOKEN}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "canopylabs/orpheus-v1-english",
+                        input: text,
+                        voice: "hannah",
+                        response_format: "wav"
+                    })
+                });
+                if (!response.ok) throw new Error("Orpheus TTS failed");
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                currentAudio = new Audio(audioUrl);
+                currentAudio.onplay = () => { 
+                    aiResponseText.innerText = text; 
+                    replayBtn.style.display = 'inline-block'; // Show replay once playing
+                };
+                currentAudio.play();
+            } catch (err) {
+                console.error("Orpheus TTS error:", err);
+                aiResponseText.innerText = text;
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-IN';
+                speechSynthesis.speak(utterance);
+            }
+        }
+    </script>
+</body>
+
+</html>
