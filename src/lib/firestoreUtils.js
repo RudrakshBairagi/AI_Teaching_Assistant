@@ -64,3 +64,33 @@ export async function deleteSessionFromFirestore(sessionId) {
   const sessionRef = doc(db, "global_sessions", sessionId);
   await deleteDoc(sessionRef);
 }
+
+// Save a completed quiz
+export async function saveQuizToFirestore(quizId, quizData, score, userAnswers) {
+  if (!quizId || !quizData) return;
+  const quizRef = doc(db, "global_quizzes", quizId);
+  
+  await setDoc(quizRef, {
+    quizId,
+    topic: quizData.topic || "General Knowledge",
+    questions: quizData.questions,
+    score,
+    totalQuestions: quizData.questions.length,
+    userAnswers,
+    createdAt: serverTimestamp()
+  });
+}
+
+// Subscribe to past quizzes
+export function subscribeToQuizzes(callback) {
+  const quizzesRef = collection(db, "global_quizzes");
+  const q = query(quizzesRef, orderBy("createdAt", "desc"));
+  
+  return onSnapshot(q, (snapshot) => {
+    const quizzes = [];
+    snapshot.forEach(doc => {
+      quizzes.push({ id: doc.id, ...doc.data() });
+    });
+    callback(quizzes);
+  });
+}

@@ -5,27 +5,34 @@ import Lottie from "lottie-react";
 import avatarAnimation from "../../../public/avatar.json";
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
+import { saveQuizToFirestore, subscribeToQuizzes } from "../../lib/firestoreUtils";
 
-function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled, timerSetting }) {
+function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled, timerSetting, reviewMode }) {
   const [currentQ, setCurrentQ] = useState(0);
-  const [selected, setSelected] = useState(null);
-  const [answered, setAnswered] = useState(false);
-  const [score, setScore] = useState(0);
+  const [selected, setSelected] = useState(reviewMode ? quizData.userAnswers[0] : null);
+  const [answered, setAnswered] = useState(reviewMode ? true : false);
+  const [score, setScore] = useState(reviewMode ? quizData.score : 0);
   const [finished, setFinished] = useState(false);
+  const [userAnswers, setUserAnswers] = useState(reviewMode ? quizData.userAnswers : []);
+  const [hasSaved, setHasSaved] = useState(false);
 
   const initialTime = timerSetting === "none" ? null : parseInt(timerSetting) * 60;
   const [timeLeft, setTimeLeft] = useState(initialTime);
 
   useEffect(() => {
-    if (timeLeft === null || finished) return;
+    if (reviewMode || timeLeft === null || finished) return;
     if (timeLeft <= 0) {
       setFinished(true);
       if (voiceEnabled) speakText("Time is up! Let's see your results.");
+      if (!hasSaved) {
+        saveQuizToFirestore(crypto.randomUUID(), quizData, score, userAnswers);
+        setHasSaved(true);
+      }
       return;
     }
     const timerId = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
     return () => clearInterval(timerId);
-  }, [timeLeft, finished, voiceEnabled]);
+  }, [timeLeft, finished, voiceEnabled, reviewMode, hasSaved, quizData, score, userAnswers]);
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -38,15 +45,19 @@ function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled, time
 
   // Auto-speak the question when it is loaded
   useEffect(() => {
-    if (q && voiceEnabled) {
+    if (q && voiceEnabled && !reviewMode) {
       speakText(`Question ${currentQ + 1}: ${q.question}`);
     }
-  }, [currentQ, voiceEnabled]);
+  }, [currentQ, voiceEnabled, reviewMode]);
 
   const handleSelect = (idx) => {
-    if (answered) return;
+    if (answered || reviewMode) return;
     setSelected(idx);
     setAnswered(true);
+    
+    const newAnswers = [...userAnswers];
+    newAnswers[currentQ] = idx;
+    setUserAnswers(newAnswers);
     let newScore = score;
     if (idx === q.answer) {
       newScore = score + 1;
@@ -63,11 +74,25 @@ function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled, time
 
   const handleNext = () => {
     if (currentQ < questions.length - 1) {
-      setCurrentQ((c) => c + 1);
-      setSelected(null);
-      setAnswered(false);
+      const nextQ = currentQ + 1;
+      setCurrentQ(nextQ);
+      if (reviewMode) {
+        setSelected(userAnswers[nextQ]);
+        setAnswered(true);
+      } else {
+        setSelected(null);
+        setAnswered(false);
+      }
     } else {
+      if (reviewMode) {
+        onClose();
+        return;
+      }
       setFinished(true);
+      if (!hasSaved) {
+        saveQuizToFirestore(crypto.randomUUID(), quizData, score, userAnswers);
+        setHasSaved(true);
+      }
       const percent = Math.round((score / questions.length) * 100);
       if (voiceEnabled) {
         speakText(`Quiz complete! You scored ${score} out of ${questions.length}. That is ${percent} percent.`);
@@ -185,7 +210,7 @@ function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled, time
 
       {answered && (
         <button className="btn-primary quiz-next-btn cursor-pointer self-end flex items-center gap-2" onClick={handleNext}>
-          {currentQ < questions.length - 1 ? "Next Question →" : <><i className="fa-solid fa-trophy"></i> See Results</>}
+          {currentQ < questions.length - 1 ? "Next Question →" : (reviewMode ? <><i className="fa-solid fa-check"></i> Finish Review</> : <><i className="fa-solid fa-trophy"></i> See Results</>)}
         </button>
       )}
     </div>
@@ -198,8 +223,11 @@ export default function Quiz() {
   const [language, setLanguage] = useState("English");
   const [timer, setTimer] = useState("none");
   const [quizData, setQuizData] = useState(null);
+  const [reviewMode, setReviewMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  
+  const [pastQuizzes, setPastQuizzes] = useState([]);
 
   const [isTalking, setIsTalking] = useState(false);
   const [listening, setListening] = useState(false);
@@ -231,6 +259,14 @@ export default function Quiz() {
       }
     }
   }, [isTalking]);
+
+  // Subscribe to past quizzes
+  useEffect(() => {
+    const unsubscribe = subscribeToQuizzes((quizzes) => {
+      setPastQuizzes(quizzes);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Load chat context if navigating from Tutor page
   useEffect(() => {
@@ -422,6 +458,7 @@ export default function Quiz() {
 
   const handleCloseQuiz = () => {
     setQuizData(null);
+    setReviewMode(false);
     setInstructions("");
     if (currentAudioRef.current) {
       currentAudioRef.current.pause();
@@ -507,12 +544,14 @@ export default function Quiz() {
                 isTalking={isTalking}
                 voiceEnabled={voiceEnabled}
                 timerSetting={timer}
+                reviewMode={reviewMode}
               />
             ) : (
-              <div className="bg-white p-6 rounded-2xl border border-[#0b1c30]/10 flex flex-col gap-6 shadow-sm">
-                <h2 className="text-lg font-bold text-[#0b1c30] border-b border-gray-100 pb-3 flex items-center gap-2">
-                  <i className="fa-solid fa-sliders text-[#424754]"></i> Configure Practice Quiz
-                </h2>
+              <div className="flex flex-col gap-8">
+                <div className="bg-white p-6 rounded-2xl border border-[#0b1c30]/10 flex flex-col gap-6 shadow-sm">
+                  <h2 className="text-lg font-bold text-[#0b1c30] border-b border-gray-100 pb-3 flex items-center gap-2">
+                    <i className="fa-solid fa-sliders text-[#424754]"></i> Configure Practice Quiz
+                  </h2>
                 <p className="text-sm text-gray-600">
                   Tell CDF Guru exactly what subject, topic, or specific textbook chapter you want to practice.
                 </p>
@@ -606,7 +645,43 @@ export default function Quiz() {
                   </div>
                 )}
               </div>
-            )}
+
+              {/* Community Past Quizzes Gallery */}
+              {pastQuizzes.length > 0 && (
+                <div className="bg-white p-6 rounded-2xl border border-[#0b1c30]/10 shadow-sm flex flex-col gap-4">
+                  <h2 className="text-lg font-bold text-[#0b1c30] border-b border-gray-100 pb-3 flex items-center gap-2">
+                    <i className="fa-solid fa-layer-group text-[#424754]"></i> Community Past Quizzes
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {pastQuizzes.map((pq) => {
+                      const dateStr = pq.createdAt?.toDate ? pq.createdAt.toDate().toLocaleDateString() : "Recent";
+                      return (
+                        <div 
+                          key={pq.id} 
+                          onClick={() => {
+                            setReviewMode(true);
+                            setQuizData(pq);
+                          }}
+                          className="p-4 rounded-xl border border-gray-200 hover:border-[#f47920] hover:shadow-md transition-all cursor-pointer bg-gray-50 flex flex-col gap-2 group"
+                        >
+                          <div className="flex justify-between items-start">
+                            <h3 className="font-bold text-[#0b1c30] group-hover:text-[#f47920] transition-colors line-clamp-2 pr-2">{pq.topic}</h3>
+                            <span className="text-xs font-semibold px-2 py-1 bg-green-100 text-green-700 rounded-lg flex-shrink-0">
+                              {pq.score} / {pq.totalQuestions}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center text-xs text-gray-500 font-medium mt-1">
+                            <span><i className="fa-regular fa-calendar mr-1"></i> {dateStr}</span>
+                            <span className="text-[#f47920]">Review <i className="fa-solid fa-arrow-right ml-1 opacity-0 group-hover:opacity-100 transition-opacity"></i></span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
           </div>
         </section>
       </main>
