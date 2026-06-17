@@ -57,7 +57,16 @@ export default function Navbar({ isTalking, mobileLottieRef }) {
           >
             Subjects
           </Link>
-          <a className="text-[#1a1c18]/60 hover:text-[#1a1c18] transition-colors text-sm font-medium cursor-pointer">Stats</a>
+          <Link
+            href="/stats"
+            className={`transition-colors text-sm font-medium ${
+              pathname === "/stats"
+                ? "text-[#1a1c18] font-bold border-b-2 border-[#1a1c18]"
+                : "text-[#1a1c18]/60 hover:text-[#1a1c18]"
+            }`}
+          >
+            Stats
+          </Link>
         </nav>
 
         <div className="flex items-center gap-4 text-[#1a1c18]/60">
@@ -80,9 +89,9 @@ export default function Navbar({ isTalking, mobileLottieRef }) {
         <Link href="/quiz" className={`transition-colors flex flex-col items-center gap-1 ${pathname === "/quiz" ? "text-[#d4ff33]" : "hover:text-[#1a1c18]"}`}>
           <i className="fa-solid fa-book text-xl"></i>
         </Link>
-        <a className="hover:text-[#1a1c18] transition-colors flex flex-col items-center gap-1 cursor-pointer">
+        <Link href="/stats" className={`transition-colors flex flex-col items-center gap-1 ${pathname === "/stats" ? "text-[#d4ff33]" : "hover:text-[#1a1c18]"}`}>
           <i className="fa-solid fa-chart-line text-xl"></i>
-        </a>
+        </Link>
       </nav>
     </>
   );
