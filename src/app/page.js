@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Lottie from "lottie-react";
 import avatarAnimation from "../../public/avatar.json";
 import Navbar from "../components/Navbar";
+import Link from "next/link";
 
 export default function Home() {
   const [conversationHistory, setConversationHistory] = useState([
@@ -348,10 +349,10 @@ If no image makes sense, use a general relevant keyword.`;
             </button>
 
             <div className="h-px bg-[#383a35] my-4"></div>
-            <button className="flex items-center gap-3 px-4 py-3 text-[#1a1c18]/70 hover:bg-[#1a1c18]/10 hover:text-[#1a1c18] transition-all rounded-xl group cursor-pointer">
+            <Link href="/settings" className="flex items-center gap-3 px-4 py-3 text-[#1a1c18]/70 hover:bg-[#1a1c18]/10 hover:text-[#1a1c18] transition-all rounded-xl group cursor-pointer">
               <i className="fa-solid fa-gear text-[#1a1c18]/60 group-hover:text-[#1a1c18] w-5 text-center"></i>
               <span className="text-sm font-medium">Settings</span>
-            </button>
+            </Link>
             <button className="flex items-center gap-3 px-4 py-3 text-[#1a1c18]/70 hover:bg-[#1a1c18]/10 hover:text-[#1a1c18] transition-all rounded-xl group cursor-pointer">
               <i className="fa-solid fa-circle-question text-[#1a1c18]/60 group-hover:text-[#1a1c18] w-5 text-center"></i>
               <span className="text-sm font-medium">Help</span>
