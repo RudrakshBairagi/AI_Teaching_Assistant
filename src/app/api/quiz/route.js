@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { prompt, numQuestions = 5 } = body;
+    const { prompt, numQuestions = 5, language = "English" } = body;
 
     if (!prompt) {
       return NextResponse.json({ error: "Instruction prompt is required" }, { status: 400 });
@@ -29,7 +29,8 @@ The JSON must follow this EXACT structure:
       "question": "Question text goes here...",
       "options": ["Option A", "Option B", "Option C", "Option D"],
       "answer": 0,
-      "explanation": "Brief explanation of why the correct option is right"
+      "explanation": "Brief explanation of why the correct option is right",
+      "imageKeyword": "Wikipedia search keyword for an image relevant to this question (optional, null if none)"
     }
   ]
 }
@@ -38,7 +39,7 @@ RULES:
 - Generate EXACTLY ${numQuestions} multiple-choice questions. No more, no less.
 - "answer" is the zero-based index of the correct option (0, 1, 2, or 3).
 - Questions should be educational, clear, and highly relevant to Haryana Board school subjects based on the user's instructions.
-- Respond in the same language the user uses in their request (English, Hindi, or Hinglish).
+- IMPORTANT: You MUST generate the questions, options, and explanation in the following language: ${language}.
 - Output ONLY the JSON object. Do NOT wrap it in markdown code blocks, do NOT write \`\`\`json, do NOT include intro or outro conversational text. Just output the raw JSON string starting with { and ending with }.`;
 
     const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
@@ -76,6 +77,26 @@ RULES:
     // Validate if it is parseable JSON
     try {
       const parsed = JSON.parse(aiText);
+      
+      // Fetch Wikipedia images for any questions that provided an imageKeyword
+      if (parsed.questions && Array.isArray(parsed.questions)) {
+        await Promise.all(parsed.questions.map(async (q) => {
+          if (q.imageKeyword) {
+            try {
+              const wikiRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(q.imageKeyword)}`);
+              if (wikiRes.ok) {
+                const wikiData = await wikiRes.json();
+                if (wikiData.thumbnail && wikiData.thumbnail.source) {
+                  q.image = wikiData.thumbnail.source;
+                }
+              }
+            } catch (e) {
+              console.error("Failed to fetch wiki image for keyword:", q.imageKeyword);
+            }
+          }
+        }));
+      }
+
       return NextResponse.json(parsed);
     } catch (parseError) {
       console.error("Failed to parse quiz response content as JSON:", aiText);

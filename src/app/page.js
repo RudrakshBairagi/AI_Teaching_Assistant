@@ -9,7 +9,7 @@ export default function Home() {
   const [conversationHistory, setConversationHistory] = useState([
     {
       role: "assistant",
-      content: "Hello Alex! I'm your AI Tutor. What are we exploring today? Whether it's a tricky math problem or a history mystery, I'm here to help!"
+      content: "Namaste! I'm your AI Tutor. What are we exploring today? Whether it's a tricky math problem or a history mystery, I'm here to help!"
     }
   ]);
   const [inputValue, setInputValue] = useState("");
@@ -17,6 +17,10 @@ export default function Home() {
   const [isTalking, setIsTalking] = useState(false);
   const [listening, setListening] = useState(false);
   
+  const [showQuestsModal, setShowQuestsModal] = useState(false);
+  const [questsLoading, setQuestsLoading] = useState(false);
+  const [questsList, setQuestsList] = useState([]);
+
   const currentAudioRef = useRef(null);
   const recognitionRef = useRef(null);
   const lottieRef = useRef(null);
@@ -208,6 +212,7 @@ If no image makes sense, use a general relevant keyword.`;
       currentAudioRef.current.pause();
       currentAudioRef.current = null;
     }
+    window.speechSynthesis.cancel();
 
     try {
       const response = await fetch("/api/tts", {
@@ -221,6 +226,10 @@ If no image makes sense, use a general relevant keyword.`;
       const audioBlob = await response.blob();
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
+      
+      if (currentAudioRef.current) {
+        currentAudioRef.current.pause();
+      }
       currentAudioRef.current = audio;
 
       audio.onplay = () => {
@@ -230,10 +239,13 @@ If no image makes sense, use a general relevant keyword.`;
       audio.onpause = () => setIsTalking(false);
       audio.onended = () => setIsTalking(false);
       
-      audio.play();
+      audio.play().catch(e => {
+        if (e.name !== 'AbortError') console.error("Audio playback error:", e);
+      });
     } catch (err) {
       console.error("TTS error:", err);
       // Fallback to browser TTS
+      window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.onstart = () => setIsTalking(true);
       utterance.onend = () => setIsTalking(false);
@@ -245,7 +257,7 @@ If no image makes sense, use a general relevant keyword.`;
     setConversationHistory([
       {
         role: "assistant",
-        content: "Chat cleared! What shall we learn today, Alex? Ask me anything!"
+        content: "Chat cleared! What shall we learn today? Ask me anything!"
       }
     ]);
     if (currentAudioRef.current) {
@@ -270,6 +282,42 @@ If no image makes sense, use a general relevant keyword.`;
     window.location.href = "/quiz";
   };
 
+  const handleGenerateQuests = async () => {
+    let chatContext = conversationHistory
+      .filter(m => m.role === "user" || m.role === "assistant")
+      .map(m => (m.role === "user" ? "Student asked: " : "Tutor taught: ") + m.content)
+      .join("\n");
+      
+    if (!chatContext || chatContext.length < 10) {
+      chatContext = "General knowledge and study habits.";
+    }
+
+    setShowQuestsModal(true);
+    setQuestsLoading(true);
+
+    try {
+      const response = await fetch("/api/quests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ context: chatContext })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setQuestsList(data.quests || []);
+      } else {
+        console.error("Failed to fetch quests");
+        setQuestsList([]);
+      }
+    } catch (e) {
+      console.error(e);
+      setQuestsList([]);
+    } finally {
+      setQuestsLoading(false);
+    }
+  };
+
+  const activeVisualAid = conversationHistory.slice().reverse().find(m => m.role === "assistant" && m.image)?.image || null;
+
   return (
     <div className="h-screen flex flex-col bg-[#dfd5bb] text-[#1a1c18] antialiased overflow-hidden">
       <Navbar isTalking={isTalking} mobileLottieRef={mobileLottieRef} />
@@ -280,29 +328,25 @@ If no image makes sense, use a general relevant keyword.`;
           <div className="flex items-center gap-3 mb-8 px-2">
             <div className="w-12 h-12 rounded-full overflow-hidden border border-[#383a35]">
               <img
-                alt="Student profile picture"
+                alt="School Logo"
                 className="w-full h-full object-cover"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLLV308CfVHdM4Tl4QiujlO8M_nEsuUcx381PJz3xZ3f5yZ5fAskIsPvUjB6bmkRv2h_J5dG7sYRYw3jQKic_4oS55H1GyKwd0pBXRDlpVE2HosX8byA_LkAiXMbYtPb5znDFwhgGeNJQYUuuHuubsHcRV4ijx1bopZmFP3aSB15bmhouliA5jKygE0YGIKoGeDA9w-OT38-YoIIO_cf0EHWfnLL-BX4Wc2S5KUENExDeGdmadh3_wTaFDf5pPGtRw0hWyFSFXsaM"
+                src="/school_logo.png"
               />
             </div>
             <div>
-              <p className="text-base font-semibold text-[#1a1c18]">Alex Johnson</p>
-              <p className="text-xs font-medium text-[#1a1c18]/60">Grade 10 • Gold League</p>
+              <p className="text-base font-semibold text-[#1a1c18]">Govt. Senior Secondary School</p>
+              <p className="text-xs font-medium text-[#1a1c18]/60">Haryana Board • SCERT Syllabus</p>
             </div>
           </div>
           <nav className="flex flex-col gap-2">
-            <button className="flex items-center gap-3 px-4 py-3 text-[#1a1c18]/70 hover:bg-[#1a1c18]/10 hover:text-[#1a1c18] transition-all rounded-xl group cursor-pointer">
+            <button 
+              onClick={handleGenerateQuests}
+              className="flex items-center gap-3 px-4 py-3 text-[#1a1c18]/70 hover:bg-[#1a1c18]/10 hover:text-[#1a1c18] transition-all rounded-xl group cursor-pointer"
+            >
               <i className="fa-solid fa-award text-[#1a1c18]/60 group-hover:text-warning w-5 text-center"></i>
               <span className="text-sm font-medium">Daily Quests</span>
             </button>
-            <button className="flex items-center gap-3 px-4 py-3 text-[#1a1c18]/70 hover:bg-[#1a1c18]/10 hover:text-[#1a1c18] transition-all rounded-xl group cursor-pointer">
-              <i className="fa-solid fa-users text-[#1a1c18]/60 group-hover:text-success w-5 text-center"></i>
-              <span className="text-sm font-medium">Study Groups</span>
-            </button>
-            <button className="flex items-center gap-3 px-4 py-3 text-[#1a1c18]/70 hover:bg-[#1a1c18]/10 hover:text-[#1a1c18] transition-all rounded-xl group cursor-pointer">
-              <i className="fa-solid fa-medal text-[#1a1c18]/60 group-hover:text-warning w-5 text-center"></i>
-              <span className="text-sm font-medium">Achievements</span>
-            </button>
+
             <div className="h-px bg-[#383a35] my-4"></div>
             <button className="flex items-center gap-3 px-4 py-3 text-[#1a1c18]/70 hover:bg-[#1a1c18]/10 hover:text-[#1a1c18] transition-all rounded-xl group cursor-pointer">
               <i className="fa-solid fa-gear text-[#1a1c18]/60 group-hover:text-[#1a1c18] w-5 text-center"></i>
@@ -333,19 +377,39 @@ If no image makes sense, use a general relevant keyword.`;
         <section className="flex-1 flex flex-col relative h-[calc(100vh-60px)] md:h-[calc(100vh-60px)]">
           
           {/* AI Avatar Header (Desktop & Large screens) */}
-          <div className="hidden md:flex flex-col items-center justify-center py-6 border-b border-[#1a1c18]/10 bg-[#dfd5bb]/80 backdrop-blur-md z-10 sticky top-0 shrink-0">
-            <div className="w-80 h-80 flex items-center justify-center overflow-hidden bg-[#1a1c18]/5 rounded-full border border-[#1a1c18]/10 shadow-sm">
-              <Lottie
-                lottieRef={lottieRef}
-                animationData={avatarAnimation}
-                loop={true}
-                autoplay={false}
-                style={{ width: 400, height: 400 }}
-              />
+          <div className={`hidden md:flex items-center py-4 border-b border-[#1a1c18]/10 bg-[#dfd5bb]/80 backdrop-blur-md z-10 sticky top-0 shrink-0 transition-all duration-700 ease-in-out ${activeVisualAid ? 'justify-between px-16' : 'justify-center'}`}>
+            
+            {/* Avatar Section */}
+            <div className="flex flex-col items-center transition-all duration-700 ease-in-out">
+              <div className="w-80 h-80 flex items-center justify-center overflow-hidden bg-[#1a1c18]/5 rounded-full border border-[#1a1c18]/10 shadow-sm transition-all duration-700">
+                <Lottie
+                  lottieRef={lottieRef}
+                  animationData={avatarAnimation}
+                  loop={true}
+                  autoplay={false}
+                  style={{ width: 400, height: 400 }}
+                />
+              </div>
+              <p className="text-xs font-bold text-[#1a1c18] mt-2 tracking-wide uppercase transition-all duration-700">
+                {isTalking ? "Speaking..." : "Ready to Help"}
+              </p>
             </div>
-            <p className="text-xs font-bold text-[#1a1c18] mt-2 tracking-wide uppercase">
-              {isTalking ? "Speaking..." : "Ready to Help"}
-            </p>
+
+            {/* Visual Aid Section */}
+            <div className={`transition-all duration-700 ease-in-out flex-shrink-0 flex items-center justify-center ${activeVisualAid ? 'opacity-100 scale-100 translate-x-0 w-[400px] max-w-sm' : 'opacity-0 scale-90 translate-x-10 w-0 overflow-hidden'}`}>
+              {activeVisualAid && (
+                <div className="rounded-3xl overflow-hidden border border-[#1a1c18]/10 shadow-lg bg-white relative group w-full">
+                  <a href={activeVisualAid} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                    <img src={activeVisualAid} alt="Visual Aid" className="w-full h-auto object-contain max-h-72 bg-[#1a1c18]/5 group-hover:scale-[1.02] transition-transform duration-500" />
+                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity flex justify-between items-center">
+                       <p className="text-sm text-white font-medium flex items-center gap-2"><i className="fa-brands fa-wikipedia-w"></i> Wikipedia</p>
+                       <i className="fa-solid fa-expand text-white text-sm"></i>
+                    </div>
+                  </a>
+                </div>
+              )}
+            </div>
+
           </div>
 
           {/* Chat Messages Area */}
@@ -362,18 +426,7 @@ If no image makes sense, use a general relevant keyword.`;
                         <p className="text-sm text-[#1a1c18] leading-relaxed whitespace-pre-wrap">{message.content}</p>
                       </div>
                       
-                      {/* Wikipedia Visual Aid */}
-                      {message.image && (
-                        <div className="mt-2 rounded-2xl overflow-hidden border border-[#1a1c18]/10 shadow-sm max-w-sm group relative bg-white">
-                          <a href={message.image} target="_blank" rel="noopener noreferrer" className="block">
-                            <img src={message.image} alt="Visual Aid" className="w-full h-auto object-contain max-h-64 bg-[#1a1c18]/5 group-hover:scale-[1.02] transition-transform duration-300" />
-                            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity flex justify-between items-center">
-                               <p className="text-xs text-white font-medium flex items-center gap-1.5"><i className="fa-brands fa-wikipedia-w"></i> Wikipedia Image</p>
-                               <i className="fa-solid fa-expand text-white text-xs"></i>
-                            </div>
-                          </a>
-                        </div>
-                      )}
+                      {/* Visual aid moved to header */}
                     </div>
                   </div>
                 );
@@ -382,9 +435,9 @@ If no image makes sense, use a general relevant keyword.`;
                   <div key={idx} className="flex flex-row-reverse gap-3 max-w-[85%] md:max-w-[70%] self-end animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150">
                     <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-[#121410] shadow-sm flex-shrink-0">
                       <img
-                        alt="Student Profile"
+                        alt="School Logo"
                         className="w-full h-full object-cover"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLLV308CfVHdM4Tl4QiujlO8M_nEsuUcx381PJz3xZ3f5yZ5fAskIsPvUjB6bmkRv2h_J5dG7sYRYw3jQKic_4oS55H1GyKwd0pBXRDlpVE2HosX8byA_LkAiXMbYtPb5znDFwhgGeNJQYUuuHuubsHcRV4ijx1bopZmFP3aSB15bmhouliA5jKygE0YGIKoGeDA9w-OT38-YoIIO_cf0EHWfnLL-BX4Wc2S5KUENExDeGdmadh3_wTaFDf5pPGtRw0hWyFSFXsaM"
+                        src="/school_logo.png"
                       />
                     </div>
                     <div className="bg-[#1a1c18] p-4 rounded-2xl shadow-sm rounded-tr-none">
@@ -481,6 +534,59 @@ If no image makes sense, use a general relevant keyword.`;
           </div>
         </section>
       </main>
+
+      {/* Daily Quests Modal */}
+      {showQuestsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1a1c18]/60 backdrop-blur-sm transition-opacity">
+          <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+            <div className="p-6 border-b border-[#1a1c18]/10 flex justify-between items-center bg-[#dfd5bb]/20">
+              <h2 className="text-xl font-bold text-[#1a1c18] flex items-center gap-2">
+                <i className="fa-solid fa-award text-yellow-500"></i> Your Daily Quests
+              </h2>
+              <button 
+                onClick={() => setShowQuestsModal(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#1a1c18]/10 text-[#1a1c18]/60 hover:text-[#1a1c18] transition-colors cursor-pointer"
+              >
+                <i className="fa-solid fa-xmark text-lg"></i>
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto custom-scrollbar flex-1 bg-gray-50/50">
+              <p className="text-sm text-gray-600 mb-6 font-medium">
+                Complete these personalized, offline activities after school to master what you learned today!
+              </p>
+              
+              {questsLoading ? (
+                <div className="flex flex-col items-center justify-center py-12 gap-4">
+                  <div className="w-10 h-10 border-4 border-[#d4ff33] border-t-transparent rounded-full animate-spin"></div>
+                  <p className="text-sm font-semibold text-gray-500 animate-pulse">Generating your custom quests...</p>
+                </div>
+              ) : questsList.length > 0 ? (
+                <div className="flex flex-col gap-4">
+                  {questsList.map((quest, idx) => (
+                    <div key={idx} className="bg-white p-5 rounded-2xl border border-[#1a1c18]/10 shadow-sm flex gap-4 hover:shadow-md transition-shadow group">
+                      <div className="w-12 h-12 rounded-xl bg-[#dfd5bb]/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                        <i className={`fa-solid ${quest.icon || 'fa-star'} text-[#292b27] text-xl`}></i>
+                      </div>
+                      <div className="flex-1 flex flex-col gap-1.5">
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-bold text-[#1a1c18] text-base leading-tight">{quest.title}</h3>
+                          <span className="text-xs font-bold text-[#292b27] bg-[#d4ff33]/50 px-2.5 py-1 rounded-full whitespace-nowrap">
+                            <i className="fa-regular fa-clock mr-1"></i> {quest.estimatedTime}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600 leading-relaxed">{quest.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500 text-sm">Failed to load quests. Please try again.</div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

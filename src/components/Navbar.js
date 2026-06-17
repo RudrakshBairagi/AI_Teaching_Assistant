@@ -62,13 +62,13 @@ export default function Navbar({ isTalking, mobileLottieRef }) {
 
         <div className="flex items-center gap-4 text-[#1a1c18]/60">
           <button className="hover:text-[#1a1c18] transition-colors"><i className="fa-regular fa-bell"></i></button>
-          <div className="w-8 h-8 rounded-full overflow-hidden border border-[#383a35]">
-            <img 
-              alt="Student profile picture" 
-              className="w-full h-full object-cover" 
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLLV308CfVHdM4Tl4QiujlO8M_nEsuUcx381PJz3xZ3f5yZ5fAskIsPvUjB6bmkRv2h_J5dG7sYRYw3jQKic_4oS55H1GyKwd0pBXRDlpVE2HosX8byA_LkAiXMbYtPb5znDFwhgGeNJQYUuuHuubsHcRV4ijx1bopZmFP3aSB15bmhouliA5jKygE0YGIKoGeDA9w-OT38-YoIIO_cf0EHWfnLL-BX4Wc2S5KUENExDeGdmadh3_wTaFDf5pPGtRw0hWyFSFXsaM"
-            />
-          </div>
+            <div className="hidden md:flex w-9 h-9 rounded-full overflow-hidden border-2 border-[#1a1c18]/10 cursor-pointer hover:border-[#1a1c18]/30 transition-all">
+              <img
+                alt="School Logo"
+                className="w-full h-full object-cover"
+                src="/school_logo.png"
+              />
+            </div>
         </div>
       </header>
 
