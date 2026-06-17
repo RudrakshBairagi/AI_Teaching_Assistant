@@ -34,7 +34,7 @@ export default function Settings() {
           <section className="flex flex-col gap-4 border-b border-[#1a1c18]/10 pb-8">
             <h2 className="text-lg font-bold text-[#1a1c18] flex items-center gap-2">
               <div className="bg-[#1a1c18] w-8 h-8 rounded-full flex items-center justify-center">
-                <i className="fa-solid fa-language text-[#d4ff33]"></i> 
+                <i className="fa-solid fa-language text-[#f07723]"></i> 
               </div>
               Language Preferences
             </h2>
@@ -59,7 +59,7 @@ export default function Settings() {
           <section className="flex flex-col gap-4 border-b border-[#1a1c18]/10 pb-8">
             <h2 className="text-lg font-bold text-[#1a1c18] flex items-center gap-2">
               <div className="bg-[#1a1c18] w-8 h-8 rounded-full flex items-center justify-center">
-                <i className="fa-solid fa-palette text-[#d4ff33]"></i> 
+                <i className="fa-solid fa-palette text-[#f07723]"></i> 
               </div>
               Appearance
             </h2>
@@ -79,7 +79,7 @@ export default function Settings() {
           <section className="flex flex-col gap-4 border-b border-[#1a1c18]/10 pb-8">
             <h2 className="text-lg font-bold text-[#1a1c18] flex items-center gap-2">
               <div className="bg-[#1a1c18] w-8 h-8 rounded-full flex items-center justify-center">
-                <i className="fa-solid fa-bell text-[#d4ff33]"></i> 
+                <i className="fa-solid fa-bell text-[#f07723]"></i> 
               </div>
               Notifications
             </h2>
@@ -109,7 +109,7 @@ export default function Settings() {
           <section className="flex flex-col gap-4">
             <h2 className="text-lg font-bold text-[#1a1c18] flex items-center gap-2">
               <div className="bg-[#1a1c18] w-8 h-8 rounded-full flex items-center justify-center">
-                <i className="fa-solid fa-user-shield text-[#d4ff33]"></i> 
+                <i className="fa-solid fa-user-shield text-[#f07723]"></i> 
               </div>
               Account Management
             </h2>

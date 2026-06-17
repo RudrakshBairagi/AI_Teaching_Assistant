@@ -320,12 +320,12 @@ If no image makes sense, use a general relevant keyword.`;
   const activeVisualAid = conversationHistory.slice().reverse().find(m => m.role === "assistant" && m.image)?.image || null;
 
   return (
-    <div className="h-screen flex flex-col bg-[#dfd5bb] text-[#1a1c18] antialiased overflow-hidden">
+    <div className="h-screen flex flex-col bg-[#ffb266] text-[#1a1c18] antialiased overflow-hidden">
       <Navbar isTalking={isTalking} mobileLottieRef={mobileLottieRef} />
 
       <main className="flex-1 flex flex-col md:flex-row w-full relative">
         {/* Sidebar Drawer (Hidden on Mobile) */}
-        <aside className="hidden md:flex flex-col h-[calc(100vh-60px)] py-6 px-4 bg-[#1a1c18]/5 backdrop-blur-sm w-80 border-r border-[#1a1c18]/10">
+        <aside className="hidden md:flex flex-col h-[calc(100vh-60px)] py-6 px-4 bg-[#dfd5bb] backdrop-blur-sm w-80 border-r border-[#1a1c18]/10">
           <div className="flex items-center gap-3 mb-8 px-2">
             <div className="w-12 h-12 rounded-full overflow-hidden border border-[#383a35]">
               <img
@@ -366,7 +366,7 @@ If no image makes sense, use a general relevant keyword.`;
             </button>
             <button 
               onClick={handleCreateQuiz}
-              className="flex items-center gap-3 px-4 py-3 bg-[#d4ff33] text-[#1a1c18] hover:bg-[#c2f022] transition-all rounded-xl group cursor-pointer mt-4 shadow-sm"
+              className="flex items-center gap-3 px-4 py-3 bg-[#f07723] text-[#1a1c18] hover:bg-[#d86b1f] transition-all rounded-xl group cursor-pointer mt-4 shadow-sm"
             >
               <i className="fa-solid fa-bolt text-[#1a1c18] w-5 text-center"></i>
               <span className="text-sm font-bold">Quiz Me on this!</span>
@@ -378,7 +378,7 @@ If no image makes sense, use a general relevant keyword.`;
         <section className="flex-1 flex flex-col relative h-[calc(100vh-60px)] md:h-[calc(100vh-60px)]">
           
           {/* AI Avatar Header (Desktop & Large screens) */}
-          <div className={`hidden md:flex items-center py-4 border-b border-[#1a1c18]/10 bg-[#dfd5bb]/80 backdrop-blur-md z-10 sticky top-0 shrink-0 transition-all duration-700 ease-in-out ${activeVisualAid ? 'justify-between px-16' : 'justify-center'}`}>
+          <div className={`hidden md:flex items-center py-4 border-b border-[#1a1c18]/10 bg-[#ffb266]/80 backdrop-blur-md z-10 sticky top-0 shrink-0 transition-all duration-700 ease-in-out ${activeVisualAid ? 'justify-between px-16' : 'justify-center'}`}>
             
             {/* Avatar Section */}
             <div className="flex flex-col items-center transition-all duration-700 ease-in-out">
@@ -419,7 +419,7 @@ If no image makes sense, use a general relevant keyword.`;
               if (message.role === "assistant") {
                 return (
                   <div key={idx} className="flex gap-3 max-w-[85%] md:max-w-[70%] animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="w-10 h-10 rounded-xl bg-[#d4ff33] text-[#121410] flex-shrink-0 flex items-center justify-center shadow-sm">
+                    <div className="w-10 h-10 rounded-xl bg-[#f07723] text-[#121410] flex-shrink-0 flex items-center justify-center shadow-sm">
                       <i className="fa-solid fa-robot"></i>
                     </div>
                     <div className="flex flex-col gap-3">
@@ -451,7 +451,7 @@ If no image makes sense, use a general relevant keyword.`;
 
             {loading && (
               <div className="flex gap-3 max-w-[85%] md:max-w-[70%] animate-pulse">
-                <div className="w-10 h-10 rounded-xl bg-[#d4ff33] text-[#121410] flex-shrink-0 flex items-center justify-center shadow-sm">
+                <div className="w-10 h-10 rounded-xl bg-[#f07723] text-[#121410] flex-shrink-0 flex items-center justify-center shadow-sm">
                   <i className="fa-solid fa-robot"></i>
                 </div>
                 <div className="bg-white p-4 rounded-2xl shadow-sm border border-[#1a1c18]/10 rounded-tl-none">
@@ -468,7 +468,7 @@ If no image makes sense, use a general relevant keyword.`;
           </div>
 
           {/* Interaction Area */}
-          <div className="bg-[#dfd5bb]/80 backdrop-blur-md px-4 py-4 border-t border-[#1a1c18]/10 sticky bottom-0 z-40">
+          <div className="bg-[#ffb266]/80 backdrop-blur-md px-4 py-4 border-t border-[#1a1c18]/10 sticky bottom-0 z-40">
             {/* Quick Ask Chips */}
             <div className="flex gap-2 overflow-x-auto pb-3 custom-scrollbar">
               {[
@@ -526,7 +526,7 @@ If no image makes sense, use a general relevant keyword.`;
                 <button
                   onClick={() => handleSend()}
                   disabled={loading || !inputValue.trim()}
-                  className="w-9 h-9 rounded-full bg-[#d4ff33] text-[#121410] flex items-center justify-center shadow-md hover:bg-[#bde629] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-9 h-9 rounded-full bg-[#f07723] text-[#121410] flex items-center justify-center shadow-md hover:bg-[#d86b1f] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <i className="fa-solid fa-paper-plane text-xs"></i>
                 </button>
@@ -540,7 +540,7 @@ If no image makes sense, use a general relevant keyword.`;
       {showQuestsModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1a1c18]/60 backdrop-blur-sm transition-opacity">
           <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-300">
-            <div className="p-6 border-b border-[#1a1c18]/10 flex justify-between items-center bg-[#dfd5bb]/20">
+            <div className="p-6 border-b border-[#1a1c18]/10 flex justify-between items-center bg-[#ffb266]/20">
               <h2 className="text-xl font-bold text-[#1a1c18] flex items-center gap-2">
                 <i className="fa-solid fa-award text-yellow-500"></i> Your Daily Quests
               </h2>
@@ -559,20 +559,20 @@ If no image makes sense, use a general relevant keyword.`;
               
               {questsLoading ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-4">
-                  <div className="w-10 h-10 border-4 border-[#d4ff33] border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-10 h-10 border-4 border-[#f07723] border-t-transparent rounded-full animate-spin"></div>
                   <p className="text-sm font-semibold text-gray-500 animate-pulse">Generating your custom quests...</p>
                 </div>
               ) : questsList.length > 0 ? (
                 <div className="flex flex-col gap-4">
                   {questsList.map((quest, idx) => (
                     <div key={idx} className="bg-white p-5 rounded-2xl border border-[#1a1c18]/10 shadow-sm flex gap-4 hover:shadow-md transition-shadow group">
-                      <div className="w-12 h-12 rounded-xl bg-[#dfd5bb]/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                      <div className="w-12 h-12 rounded-xl bg-[#ffb266]/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                         <i className={`fa-solid ${quest.icon || 'fa-star'} text-[#292b27] text-xl`}></i>
                       </div>
                       <div className="flex-1 flex flex-col gap-1.5">
                         <div className="flex justify-between items-start">
                           <h3 className="font-bold text-[#1a1c18] text-base leading-tight">{quest.title}</h3>
-                          <span className="text-xs font-bold text-[#292b27] bg-[#d4ff33]/50 px-2.5 py-1 rounded-full whitespace-nowrap">
+                          <span className="text-xs font-bold text-[#292b27] bg-[#f07723]/50 px-2.5 py-1 rounded-full whitespace-nowrap">
                             <i className="fa-regular fa-clock mr-1"></i> {quest.estimatedTime}
                           </span>
                         </div>

@@ -83,13 +83,13 @@ export default function Navbar({ isTalking, mobileLottieRef }) {
 
       {/* Bottom Navigation (Mobile Only) */}
       <nav className="md:hidden fixed bottom-0 w-full bg-white text-gray-500 py-3 px-6 flex justify-between items-center rounded-t-[30px] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-50 border-t border-[#1a1c18]/10">
-        <Link href="/" className={`transition-colors flex flex-col items-center gap-1 ${pathname === "/" ? "text-[#d4ff33]" : "hover:text-[#1a1c18]"}`}>
+        <Link href="/" className={`transition-colors flex flex-col items-center gap-1 ${pathname === "/" ? "text-[#f07723]" : "hover:text-[#1a1c18]"}`}>
           <i className="fa-solid fa-robot text-xl"></i>
         </Link>
-        <Link href="/quiz" className={`transition-colors flex flex-col items-center gap-1 ${pathname === "/quiz" ? "text-[#d4ff33]" : "hover:text-[#1a1c18]"}`}>
+        <Link href="/quiz" className={`transition-colors flex flex-col items-center gap-1 ${pathname === "/quiz" ? "text-[#f07723]" : "hover:text-[#1a1c18]"}`}>
           <i className="fa-solid fa-book text-xl"></i>
         </Link>
-        <Link href="/stats" className={`transition-colors flex flex-col items-center gap-1 ${pathname === "/stats" ? "text-[#d4ff33]" : "hover:text-[#1a1c18]"}`}>
+        <Link href="/stats" className={`transition-colors flex flex-col items-center gap-1 ${pathname === "/stats" ? "text-[#f07723]" : "hover:text-[#1a1c18]"}`}>
           <i className="fa-solid fa-chart-line text-xl"></i>
         </Link>
       </nav>

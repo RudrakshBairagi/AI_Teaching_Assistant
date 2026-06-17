@@ -537,11 +537,11 @@ export default function Quiz() {
                   <button
                     onClick={handleGenerateQuiz}
                     disabled={loading}
-                    className="w-full md:w-auto px-6 py-3.5 bg-[#292b27] hover:bg-[#1a1c18] text-[#d4ff33] rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full md:w-auto px-6 py-3.5 bg-[#292b27] hover:bg-[#1a1c18] text-[#f07723] rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
                   >
                     {loading ? (
                       <>
-                        <span className="w-4 h-4 border-2 border-t-transparent border-[#d4ff33] rounded-full animate-spin"></span>
+                        <span className="w-4 h-4 border-2 border-t-transparent border-[#f07723] rounded-full animate-spin"></span>
                         Generating...
                       </>
                     ) : (
@@ -586,7 +586,7 @@ export default function Quiz() {
               
               {questsLoading ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-4">
-                  <div className="w-10 h-10 border-4 border-[#d4ff33] border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-10 h-10 border-4 border-[#f07723] border-t-transparent rounded-full animate-spin"></div>
                   <p className="text-sm font-semibold text-gray-500 animate-pulse">Generating your custom quests...</p>
                 </div>
               ) : questsList.length > 0 ? (
@@ -599,7 +599,7 @@ export default function Quiz() {
                       <div className="flex-1 flex flex-col gap-1.5">
                         <div className="flex justify-between items-start">
                           <h3 className="font-bold text-[#1a1c18] text-base leading-tight">{quest.title}</h3>
-                          <span className="text-xs font-bold text-[#292b27] bg-[#d4ff33]/50 px-2.5 py-1 rounded-full whitespace-nowrap">
+                          <span className="text-xs font-bold text-[#292b27] bg-[#f07723]/50 px-2.5 py-1 rounded-full whitespace-nowrap">
                             <i className="fa-regular fa-clock mr-1"></i> {quest.estimatedTime}
                           </span>
                         </div>

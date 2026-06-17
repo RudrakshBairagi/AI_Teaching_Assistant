@@ -3,7 +3,7 @@
 
 @theme {
   --color-sidebar: #1a1c18;
-  --color-primary: #d4ff33;
+  --color-primary: #f07723;
   --color-primary-foreground: #121410;
   --color-surface: #121410;
   --color-surface-container-low: #1a1c18;
@@ -29,7 +29,7 @@
   --text-muted: #5b5f56;
   --card-bg: rgba(26, 28, 24, 0.05);
   --glass-border: rgba(26, 28, 24, 0.1);
-  --accent: #d4ff33;
+  --accent: #f07723;
 }
 
 body {
@@ -232,7 +232,7 @@ button {
 
 .btn-primary {
   background: #292b27;
-  color: #d4ff33;
+  color: #f07723;
 }
 
 .btn-primary:hover {
@@ -532,7 +532,7 @@ button:disabled {
 }
 
 .nav-link.active {
-  color: #d4ff33;
+  color: #f07723;
   background: #292b27;
   box-shadow: 0 4px 15px rgba(26, 28, 24, 0.15);
 }

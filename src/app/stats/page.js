@@ -69,7 +69,7 @@ export default function Stats() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 bg-white p-6 rounded-3xl border border-[#1a1c18]/10 shadow-sm">
           <div>
             <h1 className="text-3xl font-bold text-[#1a1c18] flex items-center gap-3">
-              <i className="fa-solid fa-chart-pie text-[#d4ff33] drop-shadow-md"></i>
+              <i className="fa-solid fa-chart-pie text-[#f07723] drop-shadow-md"></i>
               Teacher Analytics
             </h1>
             <p className="text-[#1a1c18]/60 mt-1 font-medium">Monitor student progress and AI Tutor engagement.</p>
@@ -106,7 +106,7 @@ export default function Stats() {
         {/* Overview Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-3xl border border-[#1a1c18]/10 shadow-sm flex items-center gap-5 hover:shadow-md transition-shadow group">
-            <div className="w-14 h-14 rounded-2xl bg-[#d4ff33]/20 flex items-center justify-center text-[#292b27] group-hover:scale-110 transition-transform">
+            <div className="w-14 h-14 rounded-2xl bg-[#f07723]/20 flex items-center justify-center text-[#292b27] group-hover:scale-110 transition-transform">
               <i className="fa-solid fa-comments text-2xl"></i>
             </div>
             <div>
@@ -160,7 +160,7 @@ export default function Stats() {
                     </div>
                     <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
                       <div 
-                        className={`h-2.5 rounded-full ${chap.progress > 80 ? 'bg-[#d4ff33]' : chap.progress > 50 ? 'bg-yellow-400' : 'bg-red-400'}`}
+                        className={`h-2.5 rounded-full ${chap.progress > 80 ? 'bg-[#f07723]' : chap.progress > 50 ? 'bg-yellow-400' : 'bg-red-400'}`}
                         style={{ width: `${chap.progress}%` }}
                       ></div>
                     </div>
