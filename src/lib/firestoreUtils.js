@@ -94,3 +94,10 @@ export function subscribeToQuizzes(callback) {
     callback(quizzes);
   });
 }
+
+// Delete a quiz
+export async function deleteQuizFromFirestore(quizId) {
+  if (!quizId) return;
+  const quizRef = doc(db, "global_quizzes", quizId);
+  await deleteDoc(quizRef);
+}

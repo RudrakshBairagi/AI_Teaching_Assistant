@@ -5,7 +5,7 @@ import Lottie from "lottie-react";
 import avatarAnimation from "../../../public/avatar.json";
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
-import { saveQuizToFirestore, subscribeToQuizzes } from "../../lib/firestoreUtils";
+import { saveQuizToFirestore, subscribeToQuizzes, deleteQuizFromFirestore } from "../../lib/firestoreUtils";
 
 function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled, timerSetting, reviewMode }) {
   const [currentQ, setCurrentQ] = useState(0);
@@ -671,7 +671,19 @@ export default function Quiz() {
                             </span>
                           </div>
                           <div className="flex justify-between items-center text-xs text-gray-500 font-medium mt-1">
-                            <span><i className="fa-regular fa-calendar mr-1"></i> {dateStr}</span>
+                            <div className="flex items-center gap-3">
+                              <span><i className="fa-regular fa-calendar mr-1"></i> {dateStr}</span>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteQuizFromFirestore(pq.id);
+                                }}
+                                className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity p-1 cursor-pointer"
+                                title="Delete Quiz"
+                              >
+                                <i className="fa-solid fa-trash-can"></i>
+                              </button>
+                            </div>
                             <span className="text-[#f47920]">Review <i className="fa-solid fa-arrow-right ml-1 opacity-0 group-hover:opacity-100 transition-opacity"></i></span>
                           </div>
                         </div>
