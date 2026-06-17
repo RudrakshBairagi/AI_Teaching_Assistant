@@ -185,6 +185,15 @@ export default function Quiz() {
     }
   }, [isTalking]);
 
+  // Load chat context if navigating from Tutor page
+  useEffect(() => {
+    const context = localStorage.getItem("quizContext");
+    if (context) {
+      setInstructions(context);
+      localStorage.removeItem("quizContext");
+    }
+  }, []);
+
   const speakText = async (text) => {
     if (!voiceEnabled) return;
     if (currentAudioRef.current) {
@@ -302,13 +311,13 @@ export default function Quiz() {
 
             {/* AI Tutor Avatar Window */}
             <div className="flex flex-col items-center bg-[#1a1c18]/5 rounded-2xl p-4 border border-[#1a1c18]/10 text-center">
-              <div className="w-28 h-28 flex items-center justify-center">
+              <div className="w-72 h-72 flex items-center justify-center">
                 <Lottie
                   lottieRef={lottieRef}
                   animationData={avatarAnimation}
                   loop={true}
                   autoplay={false}
-                  style={{ width: 110, height: 110 }}
+                  style={{ width: 340, height: 340 }}
                 />
               </div>
               <div className="text-sm font-bold mt-2 text-[#1a1c18] flex items-center gap-2 justify-center">

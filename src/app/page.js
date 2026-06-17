@@ -22,6 +22,11 @@ export default function Home() {
   const lottieRef = useRef(null);
   const mobileLottieRef = useRef(null);
   const chatEndRef = useRef(null);
+  const handleSendRef = useRef(null);
+
+  useEffect(() => {
+    handleSendRef.current = handleSend;
+  });
 
   useEffect(() => {
     // Setup Speech Recognition
@@ -35,7 +40,9 @@ export default function Home() {
       recognition.onresult = async (event) => {
         const speechResult = event.results[0][0].transcript;
         setListening(false);
-        handleSend(speechResult);
+        if (handleSendRef.current) {
+          handleSendRef.current(speechResult);
+        }
       };
 
       recognition.onspeechend = () => {
@@ -247,6 +254,22 @@ If no image makes sense, use a general relevant keyword.`;
     }
   };
 
+  const handleCreateQuiz = () => {
+    let chatContext = conversationHistory
+      .filter(m => m.role === "user" || m.role === "assistant")
+      .map(m => (m.role === "user" ? "Student asked: " : "Tutor taught: ") + m.content)
+      .join("\n");
+      
+    if (!chatContext || chatContext.length < 10) {
+      chatContext = "Generate a general knowledge quiz on what we just discussed.";
+    } else {
+      chatContext = "Create a quiz testing me on the concepts we just discussed:\n\n" + chatContext;
+    }
+    
+    localStorage.setItem("quizContext", chatContext);
+    window.location.href = "/quiz";
+  };
+
   return (
     <div className="h-screen flex flex-col bg-[#dfd5bb] text-[#1a1c18] antialiased overflow-hidden">
       <Navbar isTalking={isTalking} mobileLottieRef={mobileLottieRef} />
@@ -296,11 +319,35 @@ If no image makes sense, use a general relevant keyword.`;
               <i className="fa-solid fa-rotate-right text-[#1a1c18]/60 group-hover:text-red-500 w-5 text-center"></i>
               <span className="text-sm font-medium">New Chat</span>
             </button>
+            <button 
+              onClick={handleCreateQuiz}
+              className="flex items-center gap-3 px-4 py-3 bg-[#d4ff33] text-[#1a1c18] hover:bg-[#c2f022] transition-all rounded-xl group cursor-pointer mt-4 shadow-sm"
+            >
+              <i className="fa-solid fa-bolt text-[#1a1c18] w-5 text-center"></i>
+              <span className="text-sm font-bold">Quiz Me on this!</span>
+            </button>
           </nav>
         </aside>
 
         {/* Chat Canvas */}
         <section className="flex-1 flex flex-col relative h-[calc(100vh-60px)] md:h-[calc(100vh-60px)]">
+          
+          {/* AI Avatar Header (Desktop & Large screens) */}
+          <div className="hidden md:flex flex-col items-center justify-center py-6 border-b border-[#1a1c18]/10 bg-[#dfd5bb]/80 backdrop-blur-md z-10 sticky top-0 shrink-0">
+            <div className="w-80 h-80 flex items-center justify-center overflow-hidden bg-[#1a1c18]/5 rounded-full border border-[#1a1c18]/10 shadow-sm">
+              <Lottie
+                lottieRef={lottieRef}
+                animationData={avatarAnimation}
+                loop={true}
+                autoplay={false}
+                style={{ width: 400, height: 400 }}
+              />
+            </div>
+            <p className="text-xs font-bold text-[#1a1c18] mt-2 tracking-wide uppercase">
+              {isTalking ? "Speaking..." : "Ready to Help"}
+            </p>
+          </div>
+
           {/* Chat Messages Area */}
           <div className="flex-1 overflow-y-auto px-4 py-6 custom-scrollbar flex flex-col gap-6" id="chat-container">
             {conversationHistory.map((message, idx) => {
@@ -315,18 +362,15 @@ If no image makes sense, use a general relevant keyword.`;
                         <p className="text-sm text-[#1a1c18] leading-relaxed whitespace-pre-wrap">{message.content}</p>
                       </div>
                       
-                      {/* Wikipedia Visual Aid Card */}
+                      {/* Wikipedia Visual Aid */}
                       {message.image && (
-                        <div className="bg-[#1e201c] rounded-2xl p-3 shadow-card border border-[#292b27] flex items-center gap-3 hover:shadow-md hover:border-[#383a35] transition-all cursor-pointer group w-fit">
-                          <div className="w-10 h-10 bg-[#d4ff33]/10 rounded-xl flex items-center justify-center text-[#d4ff33] overflow-hidden">
-                            <img src={message.image} alt="Visual" className="w-full h-full object-cover" />
-                          </div>
-                          <div className="flex-1 min-w-[120px]">
-                            <p className="text-sm font-semibold text-white">Visual Aid</p>
-                            <p className="text-[10px] text-gray-400">Wikipedia image</p>
-                          </div>
-                          <a href={message.image} target="_blank" rel="noopener noreferrer" className="text-[#d4ff33]">
-                            <i className="fa-solid fa-chevron-right text-gray-500 text-xs group-hover:translate-x-1 transition-transform pr-1"></i>
+                        <div className="mt-2 rounded-2xl overflow-hidden border border-[#1a1c18]/10 shadow-sm max-w-sm group relative bg-white">
+                          <a href={message.image} target="_blank" rel="noopener noreferrer" className="block">
+                            <img src={message.image} alt="Visual Aid" className="w-full h-auto object-contain max-h-64 bg-[#1a1c18]/5 group-hover:scale-[1.02] transition-transform duration-300" />
+                            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity flex justify-between items-center">
+                               <p className="text-xs text-white font-medium flex items-center gap-1.5"><i className="fa-brands fa-wikipedia-w"></i> Wikipedia Image</p>
+                               <i className="fa-solid fa-expand text-white text-xs"></i>
+                            </div>
                           </a>
                         </div>
                       )}
