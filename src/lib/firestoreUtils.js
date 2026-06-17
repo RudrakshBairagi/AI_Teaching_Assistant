@@ -2,9 +2,9 @@ import { db } from "./firebase";
 import { collection, doc, setDoc, getDocs, getDoc, deleteDoc, query, orderBy, serverTimestamp, onSnapshot } from "firebase/firestore";
 
 // Save a session
-export async function saveSessionToFirestore(uid, sessionId, conversationHistory) {
-  if (!uid || !sessionId) return;
-  const sessionRef = doc(db, "users", uid, "sessions", sessionId);
+export async function saveSessionToFirestore(sessionId, conversationHistory) {
+  if (!sessionId) return;
+  const sessionRef = doc(db, "global_sessions", sessionId);
   
   // Create a title based on the first user message, or default to 'New Chat'
   const firstUserMessage = conversationHistory.find(msg => msg.role === "user");
@@ -19,10 +19,9 @@ export async function saveSessionToFirestore(uid, sessionId, conversationHistory
   }, { merge: true });
 }
 
-// Fetch all sessions for a user
-export async function getUserSessions(uid) {
-  if (!uid) return [];
-  const sessionsRef = collection(db, "users", uid, "sessions");
+// Fetch all sessions globally
+export async function getUserSessions() {
+  const sessionsRef = collection(db, "global_sessions");
   const q = query(sessionsRef, orderBy("updatedAt", "desc"));
   
   const snapshot = await getDocs(q);
@@ -35,9 +34,8 @@ export async function getUserSessions(uid) {
 }
 
 // Subscribe to sessions in real-time
-export function subscribeToUserSessions(uid, callback) {
-  if (!uid) return () => {};
-  const sessionsRef = collection(db, "users", uid, "sessions");
+export function subscribeToUserSessions(callback) {
+  const sessionsRef = collection(db, "global_sessions");
   const q = query(sessionsRef, orderBy("updatedAt", "desc"));
   
   return onSnapshot(q, (snapshot) => {
@@ -50,9 +48,9 @@ export function subscribeToUserSessions(uid, callback) {
 }
 
 // Fetch a specific session
-export async function getSessionById(uid, sessionId) {
-  if (!uid || !sessionId) return null;
-  const sessionRef = doc(db, "users", uid, "sessions", sessionId);
+export async function getSessionById(sessionId) {
+  if (!sessionId) return null;
+  const sessionRef = doc(db, "global_sessions", sessionId);
   const snapshot = await getDoc(sessionRef);
   if (snapshot.exists()) {
     return snapshot.data();
@@ -61,8 +59,8 @@ export async function getSessionById(uid, sessionId) {
 }
 
 // Delete a session
-export async function deleteSessionFromFirestore(uid, sessionId) {
-  if (!uid || !sessionId) return;
-  const sessionRef = doc(db, "users", uid, "sessions", sessionId);
+export async function deleteSessionFromFirestore(sessionId) {
+  if (!sessionId) return;
+  const sessionRef = doc(db, "global_sessions", sessionId);
   await deleteDoc(sessionRef);
 }

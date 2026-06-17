@@ -114,7 +114,7 @@ function HomeContent() {
   useEffect(() => {
     async function loadSession() {
       if (sid && user) {
-        const data = await getSessionById(user.uid, sid);
+        const data = await getSessionById(sid);
         if (data && data.conversationHistory) {
           setConversationHistory(data.conversationHistory);
           activeChatId.current = sid;
@@ -133,7 +133,7 @@ function HomeContent() {
   // Save conversation history to Firestore
   useEffect(() => {
     if (user && sessionId && activeChatId.current === sessionId && conversationHistory.length > 1) {
-      saveSessionToFirestore(user.uid, sessionId, conversationHistory);
+      saveSessionToFirestore(sessionId, conversationHistory);
     }
   }, [conversationHistory, user, sessionId]);
 

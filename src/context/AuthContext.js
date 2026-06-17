@@ -35,7 +35,7 @@ export function AuthProvider({ children }) {
     let unsubscribeSessions;
     if (user) {
       setIsLoadingSessions(true);
-      unsubscribeSessions = subscribeToUserSessions(user.uid, (realtimeSessions) => {
+      unsubscribeSessions = subscribeToUserSessions((realtimeSessions) => {
         setSessions(realtimeSessions);
         setIsLoadingSessions(false);
       });
@@ -50,8 +50,7 @@ export function AuthProvider({ children }) {
   }, [user]);
 
   const removeSession = async (sessionId) => {
-    if (!user) return;
-    await deleteSessionFromFirestore(user.uid, sessionId);
+    await deleteSessionFromFirestore(sessionId);
     setSessions((prev) => prev.filter((s) => s.id !== sessionId));
   };
 
