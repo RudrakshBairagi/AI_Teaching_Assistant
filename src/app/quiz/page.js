@@ -70,14 +70,14 @@ function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled }) {
     }
 
     return (
-      <div className="quiz-panel">
+      <div className="bg-white p-6 rounded-2xl border border-[#1a1c18]/10 flex flex-col gap-6 shadow-sm">
         <div className="quiz-results">
           <div className="quiz-results-emoji">{emoji}</div>
-          <h2>Quiz Complete!</h2>
-          <div className="quiz-score-big">{score} / {questions.length}</div>
-          <div className="quiz-score-percent">{percent}%</div>
+          <h2 className="text-xl font-bold text-[#1a1c18]">Quiz Complete!</h2>
+          <div className="quiz-score-big mt-2">{score} / {questions.length}</div>
+          <div className="quiz-score-percent font-semibold">{percent}%</div>
           <p style={{ marginTop: 10, color: "var(--text-muted)" }}>{message}</p>
-          <button className="btn-primary" onClick={onClose} style={{ marginTop: 20, alignSelf: "center" }}>
+          <button className="btn-primary mt-6 cursor-pointer" onClick={onClose}>
             Try Another Quiz
           </button>
         </div>
@@ -86,10 +86,10 @@ function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled }) {
   }
 
   return (
-    <div className="quiz-panel">
+    <div className="bg-white p-6 rounded-2xl border border-[#1a1c18]/10 flex flex-col gap-6 shadow-sm">
       <div className="quiz-header">
-        <span className="quiz-topic">{quizData.topic}</span>
-        <span className="quiz-progress">
+        <span className="quiz-topic text-lg font-bold text-[#1a1c18]">{quizData.topic}</span>
+        <span className="quiz-progress text-xs font-semibold px-3 py-1 bg-[#1a1c18]/5 rounded-full">
           Question {currentQ + 1} of {questions.length}
         </span>
       </div>
@@ -101,10 +101,10 @@ function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled }) {
         />
       </div>
 
-      <div className="quiz-question" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 15 }}>
-        <span style={{ flex: 1 }}>{q.question}</span>
+      <div className="quiz-question flex justify-between items-start gap-4">
+        <span className="flex-1 font-semibold text-base md:text-lg text-[#1a1c18]">{q.question}</span>
         <button
-          className="btn-secondary"
+          className="btn-secondary cursor-pointer"
           onClick={() => speakText(`Question ${currentQ + 1}: ${q.question}`)}
           style={{ padding: "6px 12px", fontSize: "0.85rem", borderRadius: "15px", flexShrink: 0 }}
         >
@@ -112,7 +112,7 @@ function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled }) {
         </button>
       </div>
 
-      <div className="quiz-options">
+      <div className="quiz-options flex flex-col gap-3">
         {q.options.map((opt, idx) => {
           let optClass = "quiz-option";
           if (answered) {
@@ -126,7 +126,7 @@ function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled }) {
                 <span className="quiz-option-letter">
                   {String.fromCharCode(65 + idx)}
                 </span>
-                <span className="quiz-option-text">{opt}</span>
+                <span className="quiz-option-text font-medium">{opt}</span>
                 {answered && idx === q.answer && (
                   <span className="quiz-option-badge">✅</span>
                 )}
@@ -135,7 +135,7 @@ function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled }) {
                 )}
               </div>
               {answered && idx === q.answer && q.explanation && (
-                <div className="quiz-option-explanation">
+                <div className="quiz-option-explanation text-xs md:text-sm">
                   💡 {q.explanation}
                 </div>
               )}
@@ -145,7 +145,7 @@ function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled }) {
       </div>
 
       {answered && (
-        <button className="btn-primary quiz-next-btn" onClick={handleNext}>
+        <button className="btn-primary quiz-next-btn cursor-pointer self-end" onClick={handleNext}>
           {currentQ < questions.length - 1 ? "Next Question →" : "See Results 🏆"}
         </button>
       )}
@@ -165,14 +165,22 @@ export default function Quiz() {
 
   const currentAudioRef = useRef(null);
   const lottieRef = useRef(null);
+  const mobileLottieRef = useRef(null);
 
-  // Control Lottie animation
+  // Control Lottie animations
   useEffect(() => {
     if (lottieRef.current) {
       if (isTalking) {
         lottieRef.current.play();
       } else {
         lottieRef.current.pause();
+      }
+    }
+    if (mobileLottieRef.current) {
+      if (isTalking) {
+        mobileLottieRef.current.play();
+      } else {
+        mobileLottieRef.current.pause();
       }
     }
   }, [isTalking]);
@@ -270,120 +278,165 @@ export default function Quiz() {
   };
 
   return (
-    <div className="container">
-      <div className="header">
-        <h1>CDF Guru Practice</h1>
-        <p>Interactive Quizzes tailored for Haryana Board Students</p>
-      </div>
+    <div className="min-h-screen flex flex-col bg-[#dfd5bb] text-[#1a1c18]">
+      <Navbar isTalking={isTalking} mobileLottieRef={mobileLottieRef} />
 
-      <Navbar />
-
-      <div className="main-layout">
-        <div className="teacher-area">
-          <div className={`avatar ${isTalking ? "talking" : "idle"}`}>
-            <Lottie
-              lottieRef={lottieRef}
-              animationData={avatarAnimation}
-              loop={true}
-              autoplay={false}
-              style={{ width: 200, height: 200 }}
-            />
-          </div>
-          <div style={{ marginTop: "10px", color: "var(--accent)", fontWeight: "bold" }}>
-            {isTalking ? "🔊 Speaking..." : "🤖 Ready"}
-          </div>
-
-          <div style={{ marginTop: "20px", display: "flex", alignItems: "center", gap: "8px" }}>
-            <input
-              type="checkbox"
-              id="voiceToggle"
-              checked={voiceEnabled}
-              onChange={(e) => {
-                setVoiceEnabled(e.target.checked);
-                if (!e.target.checked && currentAudioRef.current) {
-                  currentAudioRef.current.pause();
-                  setIsTalking(false);
-                }
-              }}
-              style={{ cursor: "pointer", width: "16px", height: "16px" }}
-            />
-            <label htmlFor="voiceToggle" style={{ fontSize: "0.9rem", cursor: "pointer", color: "var(--text-muted)" }}>
-              Enable Tutor Voice
-            </label>
-          </div>
-        </div>
-
-        <div className="blackboard-area">
-          {quizData ? (
-            <QuizPanel
-              quizData={quizData}
-              onClose={handleCloseQuiz}
-              speakText={speakText}
-              isTalking={isTalking}
-              voiceEnabled={voiceEnabled}
-            />
-          ) : (
-            <div className="box" style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-              <div className="label">Configure Practice Quiz</div>
-              <p style={{ fontSize: "0.95rem", color: "var(--text-muted)", marginBottom: "5px" }}>
-                Tell the AI exactly what subject, topic, or specific textbook chapter you want to practice.
-              </p>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <label style={{ fontSize: "0.85rem", fontWeight: "600", color: "var(--accent)" }}>
-                  What should this quiz test you on?
-                </label>
-                <textarea
-                  className="input-field"
-                  placeholder="e.g. Chapter 3 of Haryana Board Class 10 Science (Metals and Non-metals), or 8th grade history lesson on Independence."
-                  value={instructions}
-                  onChange={(e) => setInstructions(e.target.value)}
-                  style={{ minHeight: "100px", borderRadius: "16px", resize: "vertical" }}
-                  disabled={loading}
+      <main className="flex-1 flex flex-col md:flex-row max-w-7xl mx-auto w-full relative pb-20 md:pb-0">
+        {/* Sidebar Drawer */}
+        <aside className="hidden md:flex flex-col h-[calc(100vh-60px)] py-6 px-4 bg-[#1a1c18]/5 backdrop-blur-sm w-80 border-r border-[#1a1c18]/10 justify-between">
+          <div className="flex flex-col gap-6">
+            {/* Student Profile Card */}
+            <div className="flex items-center gap-3 px-2">
+              <div className="w-12 h-12 rounded-full overflow-hidden border border-[#383a35]">
+                <img
+                  alt="Student profile picture"
+                  className="w-full h-full object-cover"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLLV308CfVHdM4Tl4QiujlO8M_nEsuUcx381PJz3xZ3f5yZ5fAskIsPvUjB6bmkRv2h_J5dG7sYRYw3jQKic_4oS55H1GyKwd0pBXRDlpVE2HosX8byA_LkAiXMbYtPb5znDFwhgGeNJQYUuuHuubsHcRV4ijx1bopZmFP3aSB15bmhouliA5jKygE0YGIKoGeDA9w-OT38-YoIIO_cf0EHWfnLL-BX4Wc2S5KUENExDeGdmadh3_wTaFDf5pPGtRw0hWyFSFXsaM"
                 />
               </div>
+              <div>
+                <p className="text-base font-semibold text-[#1a1c18]">Alex Johnson</p>
+                <p className="text-xs font-medium text-gray-500">Grade 10 • Gold League</p>
+              </div>
+            </div>
 
-              <div style={{ display: "flex", gap: "15px", alignItems: "center", flexWrap: "wrap", marginTop: "5px" }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px", flex: 1, minWidth: "150px" }}>
-                  <label style={{ fontSize: "0.85rem", fontWeight: "600", color: "var(--accent)" }}>
-                    Number of Questions
-                  </label>
-                  <select
-                    className="input-field"
-                    value={numQuestions}
-                    onChange={(e) => setNumQuestions(Number(e.target.value))}
-                    style={{ borderRadius: "30px", width: "100%" }}
-                    disabled={loading}
-                  >
-                    <option value={5}>5 Questions</option>
-                    <option value={8}>8 Questions</option>
-                    <option value={10}>10 Questions</option>
-                    <option value={12}>12 Questions</option>
-                    <option value={15}>15 Questions</option>
-                  </select>
-                </div>
+            {/* AI Tutor Avatar Window */}
+            <div className="flex flex-col items-center bg-[#1a1c18]/5 rounded-2xl p-4 border border-[#1a1c18]/10 text-center">
+              <div className="w-28 h-28 flex items-center justify-center">
+                <Lottie
+                  lottieRef={lottieRef}
+                  animationData={avatarAnimation}
+                  loop={true}
+                  autoplay={false}
+                  style={{ width: 110, height: 110 }}
+                />
+              </div>
+              <div className="text-sm font-bold mt-2 text-[#1a1c18] flex items-center gap-2 justify-center">
+                <span className={`w-2.5 h-2.5 rounded-full ${isTalking ? "bg-green-500 animate-pulse" : "bg-gray-400"}`}></span>
+                {isTalking ? "Speaking..." : "Ready"}
+              </div>
+            </div>
 
-                <button
-                  className="btn-primary"
-                  onClick={handleGenerateQuiz}
-                  disabled={loading}
-                  style={{ alignSelf: "flex-end", padding: "15px 30px" }}
-                >
-                  {loading ? "Generating..." : "Generate Quiz 🚀"}
-                </button>
+            {/* Side Navigation */}
+            <nav className="flex flex-col gap-2">
+              {/* Tutor Voice Toggle */}
+              <div className="flex items-center gap-3 px-4 py-3 bg-[#1a1c18]/5 rounded-xl border border-[#1a1c18]/10">
+                <input
+                  type="checkbox"
+                  id="voiceToggle"
+                  checked={voiceEnabled}
+                  onChange={(e) => {
+                    setVoiceEnabled(e.target.checked);
+                    if (!e.target.checked && currentAudioRef.current) {
+                      currentAudioRef.current.pause();
+                      setIsTalking(false);
+                    }
+                  }}
+                  className="cursor-pointer w-4 h-4 rounded text-[#292b27] focus:ring-[#292b27]"
+                />
+                <label htmlFor="voiceToggle" className="text-sm font-semibold cursor-pointer text-[#1a1c18]/70">
+                  Enable Tutor Voice
+                </label>
               </div>
 
-              {errorMsg && (
-                <div style={{ color: "#ff7675", fontSize: "0.9rem", marginTop: "5px" }}>
-                  ⚠️ {errorMsg}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
+              <div className="h-px bg-[#1a1c18]/10 my-2"></div>
+              
+              <button 
+                onClick={handleCloseQuiz}
+                className="flex items-center gap-3 px-4 py-3 text-[#1a1c18]/70 hover:bg-red-500/10 hover:text-red-600 transition-all rounded-xl group w-full text-left cursor-pointer"
+              >
+                <i className="fa-solid fa-rotate-right text-gray-500 group-hover:text-red-600 w-5 text-center"></i>
+                <span className="text-sm font-medium">Reset Quiz</span>
+              </button>
+            </nav>
+          </div>
+        </aside>
 
-      <div className={`loader ${loading ? "active" : ""}`}></div>
+        {/* Blackboard area / main quiz panel */}
+        <section className="flex-1 flex flex-col p-6 h-[calc(100vh-60px)] md:h-[calc(100vh-60px)] overflow-y-auto custom-scrollbar">
+          <div className="max-w-3xl w-full mx-auto flex flex-col gap-6">
+            <div className="header text-left">
+              <h1 className="text-2xl font-bold text-[#1a1c18]">Practice Quiz</h1>
+              <p className="text-sm text-gray-500">Interactive quizzes tailored for Haryana Board students</p>
+            </div>
+
+            {quizData ? (
+              <QuizPanel
+                quizData={quizData}
+                onClose={handleCloseQuiz}
+                speakText={speakText}
+                isTalking={isTalking}
+                voiceEnabled={voiceEnabled}
+              />
+            ) : (
+              <div className="bg-white p-6 rounded-2xl border border-[#1a1c18]/10 flex flex-col gap-6 shadow-sm">
+                <h2 className="text-lg font-bold text-[#1a1c18] border-b border-gray-100 pb-3 flex items-center gap-2">
+                  <i className="fa-solid fa-sliders text-[#292b27]"></i> Configure Practice Quiz
+                </h2>
+                <p className="text-sm text-gray-600">
+                  Tell CDF Guru exactly what subject, topic, or specific textbook chapter you want to practice.
+                </p>
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-[#1a1c18]">
+                    What should this quiz test you on?
+                  </label>
+                  <textarea
+                    className="w-full p-4 rounded-xl border border-gray-200 bg-gray-50 focus:border-[#1a1c18] focus:ring-2 focus:ring-[#1a1c18]/5 text-sm text-[#1a1c18] outline-none transition-all resize-y min-h-[100px]"
+                    placeholder="e.g. Chapter 3 of Haryana Board Class 10 Science (Metals and Non-metals), or 8th grade history lesson on Independence."
+                    value={instructions}
+                    onChange={(e) => setInstructions(e.target.value)}
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="flex flex-col md:flex-row gap-4 items-end justify-between">
+                  <div className="flex flex-col gap-2 w-full md:w-1/2">
+                    <label className="text-sm font-semibold text-[#1a1c18]">
+                      Number of Questions
+                    </label>
+                    <select
+                      className="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-[#1a1c18] cursor-pointer outline-none focus:border-[#1a1c18]"
+                      value={numQuestions}
+                      onChange={(e) => setNumQuestions(Number(e.target.value))}
+                      disabled={loading}
+                    >
+                      <option value={5}>5 Questions</option>
+                      <option value={8}>8 Questions</option>
+                      <option value={10}>10 Questions</option>
+                      <option value={12}>12 Questions</option>
+                      <option value={15}>15 Questions</option>
+                    </select>
+                  </div>
+
+                  <button
+                    onClick={handleGenerateQuiz}
+                    disabled={loading}
+                    className="w-full md:w-auto px-6 py-3.5 bg-[#292b27] hover:bg-[#1a1c18] text-[#d4ff33] rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    {loading ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-t-transparent border-[#d4ff33] rounded-full animate-spin"></span>
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        Generate Quiz <i className="fa-solid fa-rocket"></i>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {errorMsg && (
+                  <div className="text-red-500 text-sm mt-2 flex items-center gap-1.5 font-medium">
+                    <i className="fa-solid fa-triangle-exclamation"></i> {errorMsg}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
