@@ -202,6 +202,7 @@ export default function Quiz() {
   const [errorMsg, setErrorMsg] = useState("");
 
   const [isTalking, setIsTalking] = useState(false);
+  const [listening, setListening] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
 
   const [showQuestsModal, setShowQuestsModal] = useState(false);
@@ -209,6 +210,7 @@ export default function Quiz() {
   const [questsList, setQuestsList] = useState([]);
 
   const currentAudioRef = useRef(null);
+  const recognitionRef = useRef(null);
   const lottieRef = useRef(null);
   const mobileLottieRef = useRef(null);
 
@@ -248,6 +250,48 @@ export default function Quiz() {
       }
     };
   }, []);
+
+  // Setup Speech Recognition
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-IN";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onresult = (event) => {
+        const speechResult = event.results[0][0].transcript;
+        setListening(false);
+        setInstructions((prev) => prev + (prev ? " " : "") + speechResult);
+      };
+
+      recognition.onspeechend = () => {
+        recognition.stop();
+        setListening(false);
+      };
+
+      recognition.onerror = () => {
+        setListening(false);
+      };
+
+      recognitionRef.current = recognition;
+    }
+  }, []);
+
+  const handleMicClick = () => {
+    if (recognitionRef.current) {
+      if (listening) {
+        recognitionRef.current.stop();
+        setListening(false);
+      } else {
+        setListening(true);
+        recognitionRef.current.start();
+      }
+    } else {
+      alert("Sorry, your browser does not support speech recognition. Please use Chrome.");
+    }
+  };
 
   const speakText = async (text) => {
     if (!voiceEnabled) return;
@@ -477,13 +521,27 @@ export default function Quiz() {
                   <label className="text-sm font-semibold text-[#0b1c30]">
                     What should this quiz test you on?
                   </label>
-                  <textarea
-                    className="w-full p-4 rounded-xl border border-gray-200 bg-gray-50 focus:border-[#0b1c30] focus:ring-2 focus:ring-[#0b1c30]/5 text-sm text-[#0b1c30] outline-none transition-all resize-y min-h-[100px]"
-                    placeholder="e.g. Chapter 3 of Haryana Board Class 10 Science (Metals and Non-metals), or 8th grade history lesson on Independence."
-                    value={instructions}
-                    onChange={(e) => setInstructions(e.target.value)}
-                    disabled={loading}
-                  />
+                  <div className="relative">
+                    <textarea
+                      className="w-full p-4 pr-12 rounded-xl border border-gray-200 bg-gray-50 focus:border-[#0b1c30] focus:ring-2 focus:ring-[#0b1c30]/5 text-sm text-[#0b1c30] outline-none transition-all resize-y min-h-[100px]"
+                      placeholder="e.g. Chapter 3 of Haryana Board Class 10 Science (Metals and Non-metals), or 8th grade history lesson on Independence."
+                      value={instructions}
+                      onChange={(e) => setInstructions(e.target.value)}
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleMicClick}
+                      disabled={loading}
+                      className={`absolute right-3 bottom-3 w-8 h-8 flex items-center justify-center rounded-full transition-all ${
+                        listening
+                          ? "bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/30"
+                          : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                      }`}
+                    >
+                      <i className={`fa-solid ${listening ? "fa-stop" : "fa-microphone"}`}></i>
+                    </button>
+                  </div>
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-4 items-end justify-between">
