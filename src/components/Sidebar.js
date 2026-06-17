@@ -97,13 +97,16 @@ export default function Sidebar({ handleGenerateQuests, clearChat, handleCreateQ
             <span className="text-sm font-medium">Daily Quests</span>
           </button>
         ) : (
-          <Link 
-            href="/"
+          <button 
+            onClick={() => {
+              const lastSession = localStorage.getItem("lastActiveSessionId");
+              window.location.href = lastSession ? `/?sessionId=${lastSession}` : `/`;
+            }}
             className="flex items-center gap-3 px-4 py-3 text-[#0b1c30]/70 hover:bg-[#0b1c30]/10 hover:text-[#0b1c30] transition-all rounded-xl group cursor-pointer"
           >
             <i className="fa-solid fa-award text-[#0b1c30]/60 group-hover:text-warning w-5 text-center"></i>
             <span className="text-sm font-medium">Daily Quests</span>
-          </Link>
+          </button>
         )}
 
         <Link href="/settings" className={`flex items-center gap-3 px-4 py-3 transition-all rounded-xl group cursor-pointer ${pathname === '/settings' ? 'bg-[#0b1c30]/10 text-[#0b1c30] font-bold' : 'text-[#0b1c30]/70 hover:bg-[#0b1c30]/5 hover:text-[#0b1c30]'}`}>

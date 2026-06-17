@@ -130,6 +130,13 @@ function HomeContent() {
     loadSession();
   }, [user, sid]); // re-run if user logs in or sid changes
 
+  // Save active session to localStorage so we can redirect back to it
+  useEffect(() => {
+    if (sessionId) {
+      localStorage.setItem("lastActiveSessionId", sessionId);
+    }
+  }, [sessionId]);
+
   // Save conversation history to Firestore
   useEffect(() => {
     if (user && sessionId && activeChatId.current === sessionId && conversationHistory.length > 1) {
