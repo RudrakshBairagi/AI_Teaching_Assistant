@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Navbar from "../../components/Navbar";
+import Sidebar from "../../components/Sidebar";
 
 export default function Settings() {
   const [language, setLanguage] = useState("English");
@@ -19,7 +20,10 @@ export default function Settings() {
     <div className="min-h-screen flex flex-col bg-[#f4f4ee] text-[#0b1c30] font-sans">
       <Navbar />
       
-      <main className="flex-1 flex flex-col w-full max-w-4xl mx-auto px-4 sm:px-8 py-8 gap-8 pb-24 md:pb-8">
+      <main className="flex-1 flex flex-col md:flex-row w-full relative pb-20 md:pb-0">
+        <Sidebar />
+        
+        <div className="flex-1 flex flex-col w-full max-w-4xl mx-auto px-4 sm:px-8 py-8 gap-8">
         <div className="header text-left">
           <h1 className="text-3xl font-bold text-[#0b1c30] flex items-center gap-3">
             <i className="fa-solid fa-gear text-[#0b1c30]/80 drop-shadow-md"></i>
@@ -122,7 +126,7 @@ export default function Settings() {
               </button>
             </div>
           </section>
-          
+        </div>
         </div>
       </main>
 

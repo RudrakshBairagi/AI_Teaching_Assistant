@@ -10,17 +10,17 @@ export default function Navbar({ isTalking, mobileLottieRef }) {
 
   return (
     <>
-      {/* TopAppBar Shell */}
-      <header className="sticky top-0 z-50 bg-[#f4f4ee]/80 backdrop-blur-md px-4 py-3 flex justify-between items-center shadow-sm w-full border-b border-[#0b1c30]/10">
+      {/* TopAppBar Shell (Mobile Only) */}
+      <header className="md:hidden sticky top-0 z-50 bg-[#ffb266]/80 backdrop-blur-md px-4 py-3 flex justify-between items-center shadow-sm w-full border-b border-[#0b1c30]/10">
         <div className="flex items-center gap-3">
-          <button className="md:hidden text-gray-400 hover:text-[#0b1c30] transition-colors">
+          <button className="text-gray-400 hover:text-[#0b1c30] transition-colors">
             <i className="fa-solid fa-chevron-left text-lg"></i>
           </button>
           <h1 className="text-xl font-bold text-[#0b1c30]">EduMate AI</h1>
           
           {/* Mobile Avatar Badge */}
           {mobileLottieRef && (
-            <div className="flex md:hidden items-center gap-2 bg-[#0b1c30]/5 px-2.5 py-1 rounded-full border border-[#0b1c30]/10">
+            <div className="flex items-center gap-2 bg-[#0b1c30]/5 px-2.5 py-1 rounded-full border border-[#0b1c30]/10">
               <div className="w-6 h-6 flex items-center justify-center overflow-hidden">
                 <Lottie
                   lottieRef={mobileLottieRef}
@@ -33,51 +33,6 @@ export default function Navbar({ isTalking, mobileLottieRef }) {
               <span className="text-[10px] font-semibold text-[#0b1c30]">{isTalking ? "Speaking" : "Ready"}</span>
             </div>
           )}
-        </div>
-
-        {/* Desktop Nav Integration */}
-        <nav className="hidden md:flex items-center gap-6">
-          <Link
-            href="/"
-            className={`transition-colors text-sm font-medium ${
-              pathname === "/"
-                ? "text-[#0b1c30] font-bold border-b-2 border-[#0b1c30]"
-                : "text-[#0b1c30]/60 hover:text-[#0b1c30]"
-            }`}
-          >
-            Tutor
-          </Link>
-          <Link
-            href="/quiz"
-            className={`transition-colors text-sm font-medium ${
-              pathname === "/quiz"
-                ? "text-[#0b1c30] font-bold border-b-2 border-[#0b1c30]"
-                : "text-[#0b1c30]/60 hover:text-[#0b1c30]"
-            }`}
-          >
-            Subjects
-          </Link>
-          <Link
-            href="/stats"
-            className={`transition-colors text-sm font-medium ${
-              pathname === "/stats"
-                ? "text-[#0b1c30] font-bold border-b-2 border-[#0b1c30]"
-                : "text-[#0b1c30]/60 hover:text-[#0b1c30]"
-            }`}
-          >
-            Stats
-          </Link>
-        </nav>
-
-        <div className="flex items-center gap-4 text-[#0b1c30]/60">
-          <button className="hover:text-[#0b1c30] transition-colors"><i className="fa-regular fa-bell"></i></button>
-            <div className="hidden md:flex w-9 h-9 rounded-full overflow-hidden border-2 border-[#0b1c30]/10 cursor-pointer hover:border-[#0b1c30]/30 transition-all">
-              <img
-                alt="School Logo"
-                className="w-full h-full object-cover"
-                src="/school_logo.png"
-              />
-            </div>
         </div>
       </header>
 

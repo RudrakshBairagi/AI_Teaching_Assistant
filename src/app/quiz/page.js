@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Lottie from "lottie-react";
 import avatarAnimation from "../../../public/avatar.json";
 import Navbar from "../../components/Navbar";
+import Sidebar from "../../components/Sidebar";
 
 function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled, timerSetting }) {
   const [currentQ, setCurrentQ] = useState(0);
@@ -238,6 +239,16 @@ export default function Quiz() {
     }
   }, []);
 
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (currentAudioRef.current) {
+        currentAudioRef.current.pause();
+        currentAudioRef.current = null;
+      }
+    };
+  }, []);
+
   const speakText = async (text) => {
     if (!voiceEnabled) return;
     if (currentAudioRef.current) {
@@ -379,24 +390,11 @@ export default function Quiz() {
       <Navbar isTalking={isTalking} mobileLottieRef={mobileLottieRef} />
 
       <main className="flex-1 flex flex-col md:flex-row w-full relative pb-20 md:pb-0">
-        {/* Sidebar Drawer */}
-        <aside className="hidden md:flex flex-col h-[calc(100vh-60px)] py-6 px-4 bg-[#0b1c30]/5 backdrop-blur-sm w-[450px] border-r border-[#0b1c30]/10 justify-between">
+        <Sidebar handleGenerateQuests={handleGenerateQuests} />
+        
+        {/* Secondary Sidebar Drawer for Quiz Controls */}
+        <aside className="hidden md:flex flex-col h-[calc(100vh-60px)] py-6 px-4 bg-[#0b1c30]/5 backdrop-blur-sm w-[350px] border-r border-[#0b1c30]/10 justify-start">
           <div className="flex flex-col gap-6">
-            {/* Student Profile Card */}
-            <div className="flex items-center gap-3 px-2">
-              <div className="w-12 h-12 rounded-full overflow-hidden border border-[#727785]">
-                <img
-                  alt="School Logo"
-                  className="w-full h-full object-cover bg-white"
-                  src="/school_logo.png"
-                />
-              </div>
-              <div>
-                <p className="text-base font-semibold text-[#0b1c30]">Govt. Senior Secondary School</p>
-                <p className="text-xs font-medium text-gray-500">Haryana Board • SCERT Syllabus</p>
-              </div>
-            </div>
-
             {/* AI Tutor Avatar Window */}
             <div className="flex flex-col items-center bg-[#0b1c30]/5 rounded-2xl p-4 border border-[#0b1c30]/10 text-center">
               <div className="w-[400px] h-[400px] flex items-center justify-center">
@@ -438,14 +436,6 @@ export default function Quiz() {
 
               <div className="h-px bg-[#0b1c30]/10 my-2"></div>
               
-              <button 
-                onClick={handleGenerateQuests}
-                className="flex items-center gap-3 px-4 py-3 text-[#0b1c30]/70 hover:bg-[#0b1c30]/10 hover:text-[#0b1c30] transition-all rounded-xl group w-full text-left cursor-pointer"
-              >
-                <i className="fa-solid fa-award text-yellow-500/80 group-hover:text-yellow-600 w-5 text-center"></i>
-                <span className="text-sm font-medium">Daily Quests</span>
-              </button>
-
               <button 
                 onClick={handleCloseQuiz}
                 className="flex items-center gap-3 px-4 py-3 text-[#0b1c30]/70 hover:bg-red-500/10 hover:text-red-600 transition-all rounded-xl group w-full text-left cursor-pointer"

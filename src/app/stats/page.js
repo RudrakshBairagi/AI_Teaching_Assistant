@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Navbar from "../../components/Navbar";
+import Sidebar from "../../components/Sidebar";
 
 // Mock data
 const mockStats = {
@@ -64,8 +65,11 @@ export default function Stats() {
     <div className="min-h-screen flex flex-col bg-[#f4f4ee] text-[#0b1c30] font-sans">
       <Navbar />
       
-      <main className="flex-1 flex flex-col w-full max-w-7xl mx-auto px-4 sm:px-8 py-8 gap-8 pb-24 md:pb-8">
-        {/* Header & Filters */}
+      <main className="flex-1 flex flex-col md:flex-row w-full relative pb-20 md:pb-0">
+        <Sidebar />
+        
+        <div className="flex-1 flex flex-col w-full max-w-6xl mx-auto px-4 sm:px-8 py-8 gap-8">
+          {/* Header & Filters */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 bg-white p-6 rounded-3xl border border-[#0b1c30]/10 shadow-sm">
           <div>
             <h1 className="text-3xl font-bold text-[#0b1c30] flex items-center gap-3">
@@ -169,6 +173,7 @@ export default function Stats() {
               </div>
             </div>
           ))}
+        </div>
         </div>
       </main>
     </div>

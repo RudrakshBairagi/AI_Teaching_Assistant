@@ -30,6 +30,7 @@ export async function POST(request) {
       process.env.GROQ_TOKEN,
       process.env.GROQ_TOKEN_2,
       process.env.GROQ_TOKEN_3,
+      process.env.GROQ_TOKEN_4,
     ].filter(Boolean);
 
     if (tokens.length === 0) {

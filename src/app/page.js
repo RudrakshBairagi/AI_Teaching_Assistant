@@ -1,12 +1,19 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import Lottie from "lottie-react";
 import avatarAnimation from "../../public/avatar.json";
 import Navbar from "../components/Navbar";
+import Sidebar from "../components/Sidebar";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useAuth } from "../context/AuthContext";
+import { saveSessionToFirestore, getSessionById } from "../lib/firestoreUtils";
 
-export default function Home() {
+function HomeContent() {
+  const { user } = useAuth();
+  const [sessionId, setSessionId] = useState(null);
+
   const [conversationHistory, setConversationHistory] = useState([
     {
       role: "assistant",
@@ -27,6 +34,7 @@ export default function Home() {
   const lottieRef = useRef(null);
   const mobileLottieRef = useRef(null);
   const chatEndRef = useRef(null);
+  const activeChatId = useRef(null);
   const handleSendRef = useRef(null);
 
   useEffect(() => {
@@ -88,6 +96,46 @@ export default function Home() {
       chatEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [conversationHistory, loading]);
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (currentAudioRef.current) {
+        currentAudioRef.current.pause();
+        currentAudioRef.current = null;
+      }
+    };
+  }, []);
+
+  const searchParams = useSearchParams();
+  const sid = searchParams.get("sessionId");
+
+  // Initialize session or load from URL
+  useEffect(() => {
+    async function loadSession() {
+      if (sid && user) {
+        const data = await getSessionById(user.uid, sid);
+        if (data && data.conversationHistory) {
+          setConversationHistory(data.conversationHistory);
+          activeChatId.current = sid;
+          setSessionId(sid);
+        }
+      } else if (!sid) {
+        const newSid = crypto.randomUUID();
+        setConversationHistory([{ role: "assistant", content: "Namaste! I'm your AI Tutor. What are we exploring today?" }]);
+        activeChatId.current = newSid;
+        setSessionId(newSid);
+      }
+    }
+    loadSession();
+  }, [user, sid]); // re-run if user logs in or sid changes
+
+  // Save conversation history to Firestore
+  useEffect(() => {
+    if (user && sessionId && activeChatId.current === sessionId && conversationHistory.length > 1) {
+      saveSessionToFirestore(user.uid, sessionId, conversationHistory);
+    }
+  }, [conversationHistory, user, sessionId]);
 
   const handleMicClick = () => {
     if (recognitionRef.current) {
@@ -263,8 +311,16 @@ If no image makes sense, use a general relevant keyword.`;
     ]);
     if (currentAudioRef.current) {
       currentAudioRef.current.pause();
-      setIsTalking(false);
     }
+    setIsTalking(false);
+    
+    // Create a new session instead of clearing the current one
+    const newSessionId = crypto.randomUUID();
+    activeChatId.current = newSessionId;
+    setSessionId(newSessionId);
+    
+    // Clear URL if it had a sessionId
+    window.history.pushState({}, '', '/');
   };
 
   const handleCreateQuiz = () => {
@@ -324,55 +380,11 @@ If no image makes sense, use a general relevant keyword.`;
       <Navbar isTalking={isTalking} mobileLottieRef={mobileLottieRef} />
 
       <main className="flex-1 flex flex-col md:flex-row w-full relative">
-        {/* Sidebar Drawer (Hidden on Mobile) */}
-        <aside className="hidden md:flex flex-col h-[calc(100vh-60px)] py-6 px-4 bg-[#f4f4ee] backdrop-blur-sm w-80 border-r border-[#0b1c30]/10">
-          <div className="flex items-center gap-3 mb-8 px-2">
-            <div className="w-12 h-12 rounded-full overflow-hidden border border-[#727785]">
-              <img
-                alt="School Logo"
-                className="w-full h-full object-cover"
-                src="/school_logo.png"
-              />
-            </div>
-            <div>
-              <p className="text-base font-semibold text-[#0b1c30]">Govt. Senior Secondary School</p>
-              <p className="text-xs font-medium text-[#0b1c30]/60">Haryana Board • SCERT Syllabus</p>
-            </div>
-          </div>
-          <nav className="flex flex-col gap-2">
-            <button 
-              onClick={handleGenerateQuests}
-              className="flex items-center gap-3 px-4 py-3 text-[#0b1c30]/70 hover:bg-[#0b1c30]/10 hover:text-[#0b1c30] transition-all rounded-xl group cursor-pointer"
-            >
-              <i className="fa-solid fa-award text-[#0b1c30]/60 group-hover:text-warning w-5 text-center"></i>
-              <span className="text-sm font-medium">Daily Quests</span>
-            </button>
-
-            <div className="h-px bg-[#727785] my-4"></div>
-            <Link href="/settings" className="flex items-center gap-3 px-4 py-3 text-[#0b1c30]/70 hover:bg-[#0b1c30]/10 hover:text-[#0b1c30] transition-all rounded-xl group cursor-pointer">
-              <i className="fa-solid fa-gear text-[#0b1c30]/60 group-hover:text-[#0b1c30] w-5 text-center"></i>
-              <span className="text-sm font-medium">Settings</span>
-            </Link>
-            <button className="flex items-center gap-3 px-4 py-3 text-[#0b1c30]/70 hover:bg-[#0b1c30]/10 hover:text-[#0b1c30] transition-all rounded-xl group cursor-pointer">
-              <i className="fa-solid fa-circle-question text-[#0b1c30]/60 group-hover:text-[#0b1c30] w-5 text-center"></i>
-              <span className="text-sm font-medium">Help</span>
-            </button>
-            <button 
-              onClick={clearChat}
-              className="flex items-center gap-3 px-4 py-3 text-[#0b1c30]/70 hover:bg-red-500/10 hover:text-red-500 transition-all rounded-xl group cursor-pointer"
-            >
-              <i className="fa-solid fa-rotate-right text-[#0b1c30]/60 group-hover:text-red-500 w-5 text-center"></i>
-              <span className="text-sm font-medium">New Chat</span>
-            </button>
-            <button 
-              onClick={handleCreateQuiz}
-              className="flex items-center gap-3 px-4 py-3 bg-[#006b2d] text-white hover:bg-[#005321] transition-all rounded-xl group cursor-pointer mt-4 shadow-sm"
-            >
-              <i className="fa-solid fa-bolt text-white w-5 text-center"></i>
-              <span className="text-sm font-bold">Quiz Me on this!</span>
-            </button>
-          </nav>
-        </aside>
+        <Sidebar 
+          handleGenerateQuests={handleGenerateQuests} 
+          clearChat={clearChat} 
+          handleCreateQuiz={handleCreateQuiz} 
+        />
 
         {/* Chat Canvas */}
         <section className="flex-1 flex flex-col relative h-[calc(100vh-60px)] md:h-[calc(100vh-60px)]">
@@ -589,5 +601,13 @@ If no image makes sense, use a general relevant keyword.`;
         </div>
       )}
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#f4f4ee]">Loading...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }

@@ -1,4 +1,5 @@
 import "./globals.css";
+import { AuthProvider } from "../context/AuthContext";
 
 export const metadata = {
   title: "EduMate AI - AI Tutor Chat",
@@ -20,7 +21,11 @@ export default function RootLayout({ children }) {
           precedence="default"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   );
 }
