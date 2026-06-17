@@ -320,14 +320,14 @@ If no image makes sense, use a general relevant keyword.`;
   const activeVisualAid = conversationHistory.slice().reverse().find(m => m.role === "assistant" && m.image)?.image || null;
 
   return (
-    <div className="h-screen flex flex-col bg-[#ffb266] text-[#1a1c18] antialiased overflow-hidden">
+    <div className="h-screen flex flex-col bg-[#f4f4ee] text-[#0b1c30] antialiased overflow-hidden">
       <Navbar isTalking={isTalking} mobileLottieRef={mobileLottieRef} />
 
       <main className="flex-1 flex flex-col md:flex-row w-full relative">
         {/* Sidebar Drawer (Hidden on Mobile) */}
-        <aside className="hidden md:flex flex-col h-[calc(100vh-60px)] py-6 px-4 bg-[#dfd5bb] backdrop-blur-sm w-80 border-r border-[#1a1c18]/10">
+        <aside className="hidden md:flex flex-col h-[calc(100vh-60px)] py-6 px-4 bg-[#f4f4ee] backdrop-blur-sm w-80 border-r border-[#0b1c30]/10">
           <div className="flex items-center gap-3 mb-8 px-2">
-            <div className="w-12 h-12 rounded-full overflow-hidden border border-[#383a35]">
+            <div className="w-12 h-12 rounded-full overflow-hidden border border-[#727785]">
               <img
                 alt="School Logo"
                 className="w-full h-full object-cover"
@@ -335,40 +335,40 @@ If no image makes sense, use a general relevant keyword.`;
               />
             </div>
             <div>
-              <p className="text-base font-semibold text-[#1a1c18]">Govt. Senior Secondary School</p>
-              <p className="text-xs font-medium text-[#1a1c18]/60">Haryana Board • SCERT Syllabus</p>
+              <p className="text-base font-semibold text-[#0b1c30]">Govt. Senior Secondary School</p>
+              <p className="text-xs font-medium text-[#0b1c30]/60">Haryana Board • SCERT Syllabus</p>
             </div>
           </div>
           <nav className="flex flex-col gap-2">
             <button 
               onClick={handleGenerateQuests}
-              className="flex items-center gap-3 px-4 py-3 text-[#1a1c18]/70 hover:bg-[#1a1c18]/10 hover:text-[#1a1c18] transition-all rounded-xl group cursor-pointer"
+              className="flex items-center gap-3 px-4 py-3 text-[#0b1c30]/70 hover:bg-[#0b1c30]/10 hover:text-[#0b1c30] transition-all rounded-xl group cursor-pointer"
             >
-              <i className="fa-solid fa-award text-[#1a1c18]/60 group-hover:text-warning w-5 text-center"></i>
+              <i className="fa-solid fa-award text-[#0b1c30]/60 group-hover:text-warning w-5 text-center"></i>
               <span className="text-sm font-medium">Daily Quests</span>
             </button>
 
-            <div className="h-px bg-[#383a35] my-4"></div>
-            <Link href="/settings" className="flex items-center gap-3 px-4 py-3 text-[#1a1c18]/70 hover:bg-[#1a1c18]/10 hover:text-[#1a1c18] transition-all rounded-xl group cursor-pointer">
-              <i className="fa-solid fa-gear text-[#1a1c18]/60 group-hover:text-[#1a1c18] w-5 text-center"></i>
+            <div className="h-px bg-[#727785] my-4"></div>
+            <Link href="/settings" className="flex items-center gap-3 px-4 py-3 text-[#0b1c30]/70 hover:bg-[#0b1c30]/10 hover:text-[#0b1c30] transition-all rounded-xl group cursor-pointer">
+              <i className="fa-solid fa-gear text-[#0b1c30]/60 group-hover:text-[#0b1c30] w-5 text-center"></i>
               <span className="text-sm font-medium">Settings</span>
             </Link>
-            <button className="flex items-center gap-3 px-4 py-3 text-[#1a1c18]/70 hover:bg-[#1a1c18]/10 hover:text-[#1a1c18] transition-all rounded-xl group cursor-pointer">
-              <i className="fa-solid fa-circle-question text-[#1a1c18]/60 group-hover:text-[#1a1c18] w-5 text-center"></i>
+            <button className="flex items-center gap-3 px-4 py-3 text-[#0b1c30]/70 hover:bg-[#0b1c30]/10 hover:text-[#0b1c30] transition-all rounded-xl group cursor-pointer">
+              <i className="fa-solid fa-circle-question text-[#0b1c30]/60 group-hover:text-[#0b1c30] w-5 text-center"></i>
               <span className="text-sm font-medium">Help</span>
             </button>
             <button 
               onClick={clearChat}
-              className="flex items-center gap-3 px-4 py-3 text-[#1a1c18]/70 hover:bg-red-500/10 hover:text-red-500 transition-all rounded-xl group cursor-pointer"
+              className="flex items-center gap-3 px-4 py-3 text-[#0b1c30]/70 hover:bg-red-500/10 hover:text-red-500 transition-all rounded-xl group cursor-pointer"
             >
-              <i className="fa-solid fa-rotate-right text-[#1a1c18]/60 group-hover:text-red-500 w-5 text-center"></i>
+              <i className="fa-solid fa-rotate-right text-[#0b1c30]/60 group-hover:text-red-500 w-5 text-center"></i>
               <span className="text-sm font-medium">New Chat</span>
             </button>
             <button 
               onClick={handleCreateQuiz}
-              className="flex items-center gap-3 px-4 py-3 bg-[#f07723] text-[#1a1c18] hover:bg-[#d86b1f] transition-all rounded-xl group cursor-pointer mt-4 shadow-sm"
+              className="flex items-center gap-3 px-4 py-3 bg-[#006b2d] text-white hover:bg-[#005321] transition-all rounded-xl group cursor-pointer mt-4 shadow-sm"
             >
-              <i className="fa-solid fa-bolt text-[#1a1c18] w-5 text-center"></i>
+              <i className="fa-solid fa-bolt text-white w-5 text-center"></i>
               <span className="text-sm font-bold">Quiz Me on this!</span>
             </button>
           </nav>
@@ -378,11 +378,11 @@ If no image makes sense, use a general relevant keyword.`;
         <section className="flex-1 flex flex-col relative h-[calc(100vh-60px)] md:h-[calc(100vh-60px)]">
           
           {/* AI Avatar Header (Desktop & Large screens) */}
-          <div className={`hidden md:flex items-center py-4 border-b border-[#1a1c18]/10 bg-[#ffb266]/80 backdrop-blur-md z-10 sticky top-0 shrink-0 transition-all duration-700 ease-in-out ${activeVisualAid ? 'justify-between px-16' : 'justify-center'}`}>
+          <div className={`hidden md:flex items-center py-4 border-b border-[#0b1c30]/10 bg-[#f4f4ee]/80 backdrop-blur-md z-10 sticky top-0 shrink-0 transition-all duration-700 ease-in-out ${activeVisualAid ? 'justify-between px-16' : 'justify-center'}`}>
             
             {/* Avatar Section */}
             <div className="flex flex-col items-center transition-all duration-700 ease-in-out">
-              <div className="w-80 h-80 flex items-center justify-center overflow-hidden bg-[#1a1c18]/5 rounded-full border border-[#1a1c18]/10 shadow-sm transition-all duration-700">
+              <div className="w-80 h-80 flex items-center justify-center overflow-hidden bg-white rounded-full border border-[#0b1c30]/10 shadow-sm transition-all duration-700">
                 <Lottie
                   lottieRef={lottieRef}
                   animationData={avatarAnimation}
@@ -391,7 +391,7 @@ If no image makes sense, use a general relevant keyword.`;
                   style={{ width: 400, height: 400 }}
                 />
               </div>
-              <p className="text-xs font-bold text-[#1a1c18] mt-2 tracking-wide uppercase transition-all duration-700">
+              <p className="text-xs font-bold text-[#0b1c30] mt-2 tracking-wide uppercase transition-all duration-700">
                 {isTalking ? "Speaking..." : "Ready to Help"}
               </p>
             </div>
@@ -399,9 +399,9 @@ If no image makes sense, use a general relevant keyword.`;
             {/* Visual Aid Section */}
             <div className={`transition-all duration-700 ease-in-out flex-shrink-0 flex items-center justify-center ${activeVisualAid ? 'opacity-100 scale-100 translate-x-0 w-[400px] max-w-sm' : 'opacity-0 scale-90 translate-x-10 w-0 overflow-hidden'}`}>
               {activeVisualAid && (
-                <div className="rounded-3xl overflow-hidden border border-[#1a1c18]/10 shadow-lg bg-white relative group w-full">
+                <div className="rounded-3xl overflow-hidden border border-[#0b1c30]/10 shadow-lg bg-white relative group w-full">
                   <a href={activeVisualAid} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
-                    <img src={activeVisualAid} alt="Visual Aid" className="w-full h-auto object-contain max-h-72 bg-[#1a1c18]/5 group-hover:scale-[1.02] transition-transform duration-500" />
+                    <img src={activeVisualAid} alt="Visual Aid" className="w-full h-auto object-contain max-h-72 bg-[#0b1c30]/5 group-hover:scale-[1.02] transition-transform duration-500" />
                     <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity flex justify-between items-center">
                        <p className="text-sm text-white font-medium flex items-center gap-2"><i className="fa-brands fa-wikipedia-w"></i> Wikipedia</p>
                        <i className="fa-solid fa-expand text-white text-sm"></i>
@@ -419,12 +419,12 @@ If no image makes sense, use a general relevant keyword.`;
               if (message.role === "assistant") {
                 return (
                   <div key={idx} className="flex gap-3 max-w-[85%] md:max-w-[70%] animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="w-10 h-10 rounded-xl bg-[#f07723] text-[#121410] flex-shrink-0 flex items-center justify-center shadow-sm">
+                    <div className="w-10 h-10 rounded-xl bg-[#f47920] text-[#121410] flex-shrink-0 flex items-center justify-center shadow-sm">
                       <i className="fa-solid fa-robot"></i>
                     </div>
                     <div className="flex flex-col gap-3">
-                      <div className="bg-white p-4 rounded-2xl shadow-sm border border-[#1a1c18]/10 rounded-tl-none">
-                        <p className="text-sm text-[#1a1c18] leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                      <div className="bg-white p-4 rounded-2xl shadow-sm border border-[#0b1c30]/10 rounded-tl-none">
+                        <p className="text-sm text-[#0b1c30] leading-relaxed whitespace-pre-wrap">{message.content}</p>
                       </div>
                       
                       {/* Visual aid moved to header */}
@@ -441,7 +441,7 @@ If no image makes sense, use a general relevant keyword.`;
                         src="/school_logo.png"
                       />
                     </div>
-                    <div className="bg-[#1a1c18] p-4 rounded-2xl shadow-sm rounded-tr-none">
+                    <div className="bg-[#f47920] p-4 rounded-2xl shadow-sm rounded-tr-none">
                       <p className="text-sm text-white leading-relaxed whitespace-pre-wrap">{message.content}</p>
                     </div>
                   </div>
@@ -451,10 +451,10 @@ If no image makes sense, use a general relevant keyword.`;
 
             {loading && (
               <div className="flex gap-3 max-w-[85%] md:max-w-[70%] animate-pulse">
-                <div className="w-10 h-10 rounded-xl bg-[#f07723] text-[#121410] flex-shrink-0 flex items-center justify-center shadow-sm">
+                <div className="w-10 h-10 rounded-xl bg-[#f47920] text-[#121410] flex-shrink-0 flex items-center justify-center shadow-sm">
                   <i className="fa-solid fa-robot"></i>
                 </div>
-                <div className="bg-white p-4 rounded-2xl shadow-sm border border-[#1a1c18]/10 rounded-tl-none">
+                <div className="bg-white p-4 rounded-2xl shadow-sm border border-[#0b1c30]/10 rounded-tl-none">
                   <div className="flex gap-1 items-center py-1">
                     <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></span>
                     <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:0.2s]"></span>
@@ -468,7 +468,7 @@ If no image makes sense, use a general relevant keyword.`;
           </div>
 
           {/* Interaction Area */}
-          <div className="bg-[#ffb266]/80 backdrop-blur-md px-4 py-4 border-t border-[#1a1c18]/10 sticky bottom-0 z-40">
+          <div className="bg-[#f4f4ee]/80 backdrop-blur-md px-4 py-4 border-t border-[#0b1c30]/10 sticky bottom-0 z-40">
             {/* Quick Ask Chips */}
             <div className="flex gap-2 overflow-x-auto pb-3 custom-scrollbar">
               {[
@@ -481,7 +481,7 @@ If no image makes sense, use a general relevant keyword.`;
                   key={idx}
                   onClick={() => handleSend(chip)}
                   disabled={loading}
-                  className="flex-shrink-0 px-4 py-1.5 bg-[#292b27] hover:bg-[#383a35] text-gray-200 rounded-full text-xs font-medium transition-colors cursor-pointer"
+                  className="flex-shrink-0 px-4 py-1.5 bg-[#424754] hover:bg-[#727785] text-gray-200 rounded-full text-xs font-medium transition-colors cursor-pointer"
                 >
                   {chip}
                 </button>
@@ -489,17 +489,17 @@ If no image makes sense, use a general relevant keyword.`;
             </div>
 
             {/* Input Box */}
-            <div className="flex items-center gap-2 bg-white p-1.5 rounded-full border border-[#1a1c18]/10 focus-within:border-[#1a1c18] focus-within:ring-2 focus-within:ring-[#1a1c18]/5 transition-all shadow-inner">
+            <div className="flex items-center gap-2 bg-white p-1.5 rounded-full border border-[#0b1c30]/10 focus-within:border-[#0b1c30] focus-within:ring-2 focus-within:ring-[#0b1c30]/5 transition-all shadow-inner">
               <button 
                 onClick={clearChat}
                 title="New Chat"
-                className="w-9 h-9 flex items-center justify-center text-[#1a1c18]/60 hover:text-[#1a1c18] transition-colors rounded-full hover:bg-[#1a1c18]/10 cursor-pointer"
+                className="w-9 h-9 flex items-center justify-center text-[#0b1c30]/60 hover:text-[#0b1c30] transition-colors rounded-full hover:bg-[#0b1c30]/10 cursor-pointer"
               >
                 <i className="fa-solid fa-rotate-right"></i>
               </button>
               
               <input
-                className="flex-1 bg-transparent border-none focus:ring-0 text-sm text-[#1a1c18] py-2 px-2 placeholder-gray-500 outline-none"
+                className="flex-1 bg-transparent border-none focus:ring-0 text-sm text-[#0b1c30] py-2 px-2 placeholder-gray-500 outline-none"
                 placeholder="Ask EduMate anything..."
                 type="text"
                 value={inputValue}
@@ -514,7 +514,7 @@ If no image makes sense, use a general relevant keyword.`;
                   className={`w-9 h-9 rounded-full flex items-center justify-center transition-all cursor-pointer ${
                     listening
                       ? "animate-pulse bg-danger/20 text-danger"
-                      : "bg-[#292b27] text-gray-400 hover:bg-[#383a35] hover:text-white"
+                      : "bg-[#424754] text-gray-400 hover:bg-[#727785] hover:text-white"
                   }`}
                   id="voice-btn"
                   disabled={loading}
@@ -526,7 +526,7 @@ If no image makes sense, use a general relevant keyword.`;
                 <button
                   onClick={() => handleSend()}
                   disabled={loading || !inputValue.trim()}
-                  className="w-9 h-9 rounded-full bg-[#f07723] text-[#121410] flex items-center justify-center shadow-md hover:bg-[#d86b1f] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-9 h-9 rounded-full bg-[#f47920] text-[#121410] flex items-center justify-center shadow-md hover:bg-[#e06312] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <i className="fa-solid fa-paper-plane text-xs"></i>
                 </button>
@@ -538,15 +538,15 @@ If no image makes sense, use a general relevant keyword.`;
 
       {/* Daily Quests Modal */}
       {showQuestsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1a1c18]/60 backdrop-blur-sm transition-opacity">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0b1c30]/60 backdrop-blur-sm transition-opacity">
           <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-300">
-            <div className="p-6 border-b border-[#1a1c18]/10 flex justify-between items-center bg-[#ffb266]/20">
-              <h2 className="text-xl font-bold text-[#1a1c18] flex items-center gap-2">
+            <div className="p-6 border-b border-[#0b1c30]/10 flex justify-between items-center bg-[#f4f4ee]/20">
+              <h2 className="text-xl font-bold text-[#0b1c30] flex items-center gap-2">
                 <i className="fa-solid fa-award text-yellow-500"></i> Your Daily Quests
               </h2>
               <button 
                 onClick={() => setShowQuestsModal(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#1a1c18]/10 text-[#1a1c18]/60 hover:text-[#1a1c18] transition-colors cursor-pointer"
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#0b1c30]/10 text-[#0b1c30]/60 hover:text-[#0b1c30] transition-colors cursor-pointer"
               >
                 <i className="fa-solid fa-xmark text-lg"></i>
               </button>
@@ -559,20 +559,20 @@ If no image makes sense, use a general relevant keyword.`;
               
               {questsLoading ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-4">
-                  <div className="w-10 h-10 border-4 border-[#f07723] border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-10 h-10 border-4 border-[#f47920] border-t-transparent rounded-full animate-spin"></div>
                   <p className="text-sm font-semibold text-gray-500 animate-pulse">Generating your custom quests...</p>
                 </div>
               ) : questsList.length > 0 ? (
                 <div className="flex flex-col gap-4">
                   {questsList.map((quest, idx) => (
-                    <div key={idx} className="bg-white p-5 rounded-2xl border border-[#1a1c18]/10 shadow-sm flex gap-4 hover:shadow-md transition-shadow group">
-                      <div className="w-12 h-12 rounded-xl bg-[#ffb266]/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                        <i className={`fa-solid ${quest.icon || 'fa-star'} text-[#292b27] text-xl`}></i>
+                    <div key={idx} className="bg-white p-5 rounded-2xl border border-[#0b1c30]/10 shadow-sm flex gap-4 hover:shadow-md transition-shadow group">
+                      <div className="w-12 h-12 rounded-xl bg-[#f4f4ee]/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                        <i className={`fa-solid ${quest.icon || 'fa-star'} text-[#424754] text-xl`}></i>
                       </div>
                       <div className="flex-1 flex flex-col gap-1.5">
                         <div className="flex justify-between items-start">
-                          <h3 className="font-bold text-[#1a1c18] text-base leading-tight">{quest.title}</h3>
-                          <span className="text-xs font-bold text-[#292b27] bg-[#f07723]/50 px-2.5 py-1 rounded-full whitespace-nowrap">
+                          <h3 className="font-bold text-[#0b1c30] text-base leading-tight">{quest.title}</h3>
+                          <span className="text-xs font-bold text-[#424754] bg-[#f47920]/50 px-2.5 py-1 rounded-full whitespace-nowrap">
                             <i className="fa-regular fa-clock mr-1"></i> {quest.estimatedTime}
                           </span>
                         </div>

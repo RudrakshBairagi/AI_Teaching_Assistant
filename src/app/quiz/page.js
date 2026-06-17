@@ -90,10 +90,10 @@ function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled, time
     }
 
     return (
-      <div className="bg-white p-6 rounded-2xl border border-[#1a1c18]/10 flex flex-col gap-6 shadow-sm">
+      <div className="bg-white p-6 rounded-2xl border border-[#0b1c30]/10 flex flex-col gap-6 shadow-sm">
         <div className="quiz-results">
           <div className="quiz-results-emoji">{emoji}</div>
-          <h2 className="text-xl font-bold text-[#1a1c18]">Quiz Complete!</h2>
+          <h2 className="text-xl font-bold text-[#0b1c30]">Quiz Complete!</h2>
           <div className="quiz-score-big mt-2">{score} / {questions.length}</div>
           <div className="quiz-score-percent font-semibold">{percent}%</div>
           <p style={{ marginTop: 10, color: "var(--text-muted)" }}>{message}</p>
@@ -106,16 +106,16 @@ function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled, time
   }
 
   return (
-    <div className="bg-white p-6 rounded-2xl border border-[#1a1c18]/10 flex flex-col gap-6 shadow-sm">
+    <div className="bg-white p-6 rounded-2xl border border-[#0b1c30]/10 flex flex-col gap-6 shadow-sm">
       <div className="quiz-header flex justify-between items-center">
         <div>
-          <span className="quiz-topic text-lg font-bold text-[#1a1c18]">{quizData.topic}</span>
-          <span className="quiz-progress text-xs font-semibold px-3 py-1 bg-[#1a1c18]/5 rounded-full ml-3">
+          <span className="quiz-topic text-lg font-bold text-[#0b1c30]">{quizData.topic}</span>
+          <span className="quiz-progress text-xs font-semibold px-3 py-1 bg-[#0b1c30]/5 rounded-full ml-3">
             Question {currentQ + 1} of {questions.length}
           </span>
         </div>
         {timeLeft !== null && !finished && (
-          <div className={`quiz-timer text-sm font-bold px-3 py-1.5 rounded-xl flex items-center gap-2 ${timeLeft < 60 ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-white border border-[#1a1c18]/10 text-[#1a1c18]'}`}>
+          <div className={`quiz-timer text-sm font-bold px-3 py-1.5 rounded-xl flex items-center gap-2 ${timeLeft < 60 ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-white border border-[#0b1c30]/10 text-[#0b1c30]'}`}>
             <i className="fa-regular fa-clock"></i> {formatTime(timeLeft)}
           </div>
         )}
@@ -129,7 +129,7 @@ function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled, time
       </div>
 
       <div className="quiz-question flex justify-between items-start gap-4">
-        <span className="flex-1 font-semibold text-base md:text-lg text-[#1a1c18]">{q.question}</span>
+        <span className="flex-1 font-semibold text-base md:text-lg text-[#0b1c30]">{q.question}</span>
         <button
           className="btn-secondary cursor-pointer"
           onClick={() => speakText(`Question ${currentQ + 1}: ${q.question}`)}
@@ -140,9 +140,9 @@ function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled, time
       </div>
 
       {q.image && (
-        <div className="quiz-question-image rounded-2xl overflow-hidden border border-[#1a1c18]/10 shadow-sm max-w-2xl bg-white relative mt-2 mb-4">
+        <div className="quiz-question-image rounded-2xl overflow-hidden border border-[#0b1c30]/10 shadow-sm max-w-2xl bg-white relative mt-2 mb-4">
           <a href={q.image} target="_blank" rel="noopener noreferrer" className="block w-full">
-            <img src={q.image} alt="Question Visual Context" className="w-full h-auto object-contain max-h-80 bg-[#1a1c18]/5 transition-transform duration-300 hover:scale-[1.01]" />
+            <img src={q.image} alt="Question Visual Context" className="w-full h-auto object-contain max-h-80 bg-[#0b1c30]/5 transition-transform duration-300 hover:scale-[1.01]" />
             <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 opacity-0 hover:opacity-100 transition-opacity flex justify-between items-center pointer-events-none">
                <p className="text-xs text-white font-medium flex items-center gap-2"><i className="fa-brands fa-wikipedia-w"></i> Wikipedia Context</p>
             </div>
@@ -375,16 +375,16 @@ export default function Quiz() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#dfd5bb] text-[#1a1c18]">
+    <div className="min-h-screen flex flex-col bg-[#f4f4ee] text-[#0b1c30]">
       <Navbar isTalking={isTalking} mobileLottieRef={mobileLottieRef} />
 
       <main className="flex-1 flex flex-col md:flex-row w-full relative pb-20 md:pb-0">
         {/* Sidebar Drawer */}
-        <aside className="hidden md:flex flex-col h-[calc(100vh-60px)] py-6 px-4 bg-[#1a1c18]/5 backdrop-blur-sm w-[450px] border-r border-[#1a1c18]/10 justify-between">
+        <aside className="hidden md:flex flex-col h-[calc(100vh-60px)] py-6 px-4 bg-[#0b1c30]/5 backdrop-blur-sm w-[450px] border-r border-[#0b1c30]/10 justify-between">
           <div className="flex flex-col gap-6">
             {/* Student Profile Card */}
             <div className="flex items-center gap-3 px-2">
-              <div className="w-12 h-12 rounded-full overflow-hidden border border-[#383a35]">
+              <div className="w-12 h-12 rounded-full overflow-hidden border border-[#727785]">
                 <img
                   alt="School Logo"
                   className="w-full h-full object-cover bg-white"
@@ -392,13 +392,13 @@ export default function Quiz() {
                 />
               </div>
               <div>
-                <p className="text-base font-semibold text-[#1a1c18]">Govt. Senior Secondary School</p>
+                <p className="text-base font-semibold text-[#0b1c30]">Govt. Senior Secondary School</p>
                 <p className="text-xs font-medium text-gray-500">Haryana Board • SCERT Syllabus</p>
               </div>
             </div>
 
             {/* AI Tutor Avatar Window */}
-            <div className="flex flex-col items-center bg-[#1a1c18]/5 rounded-2xl p-4 border border-[#1a1c18]/10 text-center">
+            <div className="flex flex-col items-center bg-[#0b1c30]/5 rounded-2xl p-4 border border-[#0b1c30]/10 text-center">
               <div className="w-[400px] h-[400px] flex items-center justify-center">
                 <Lottie
                   lottieRef={lottieRef}
@@ -408,7 +408,7 @@ export default function Quiz() {
                   style={{ width: 480, height: 480 }}
                 />
               </div>
-              <div className="text-sm font-bold mt-2 text-[#1a1c18] flex items-center gap-2 justify-center">
+              <div className="text-sm font-bold mt-2 text-[#0b1c30] flex items-center gap-2 justify-center">
                 <span className={`w-2.5 h-2.5 rounded-full ${isTalking ? "bg-green-500 animate-pulse" : "bg-gray-400"}`}></span>
                 {isTalking ? "Speaking..." : "Ready"}
               </div>
@@ -417,7 +417,7 @@ export default function Quiz() {
             {/* Side Navigation */}
             <nav className="flex flex-col gap-2">
               {/* Tutor Voice Toggle */}
-              <div className="flex items-center gap-3 px-4 py-3 bg-[#1a1c18]/5 rounded-xl border border-[#1a1c18]/10">
+              <div className="flex items-center gap-3 px-4 py-3 bg-[#0b1c30]/5 rounded-xl border border-[#0b1c30]/10">
                 <input
                   type="checkbox"
                   id="voiceToggle"
@@ -429,18 +429,18 @@ export default function Quiz() {
                       setIsTalking(false);
                     }
                   }}
-                  className="cursor-pointer w-4 h-4 rounded text-[#292b27] focus:ring-[#292b27]"
+                  className="cursor-pointer w-4 h-4 rounded text-[#424754] focus:ring-[#424754]"
                 />
-                <label htmlFor="voiceToggle" className="text-sm font-semibold cursor-pointer text-[#1a1c18]/70">
+                <label htmlFor="voiceToggle" className="text-sm font-semibold cursor-pointer text-[#0b1c30]/70">
                   Enable Tutor Voice
                 </label>
               </div>
 
-              <div className="h-px bg-[#1a1c18]/10 my-2"></div>
+              <div className="h-px bg-[#0b1c30]/10 my-2"></div>
               
               <button 
                 onClick={handleGenerateQuests}
-                className="flex items-center gap-3 px-4 py-3 text-[#1a1c18]/70 hover:bg-[#1a1c18]/10 hover:text-[#1a1c18] transition-all rounded-xl group w-full text-left cursor-pointer"
+                className="flex items-center gap-3 px-4 py-3 text-[#0b1c30]/70 hover:bg-[#0b1c30]/10 hover:text-[#0b1c30] transition-all rounded-xl group w-full text-left cursor-pointer"
               >
                 <i className="fa-solid fa-award text-yellow-500/80 group-hover:text-yellow-600 w-5 text-center"></i>
                 <span className="text-sm font-medium">Daily Quests</span>
@@ -448,7 +448,7 @@ export default function Quiz() {
 
               <button 
                 onClick={handleCloseQuiz}
-                className="flex items-center gap-3 px-4 py-3 text-[#1a1c18]/70 hover:bg-red-500/10 hover:text-red-600 transition-all rounded-xl group w-full text-left cursor-pointer"
+                className="flex items-center gap-3 px-4 py-3 text-[#0b1c30]/70 hover:bg-red-500/10 hover:text-red-600 transition-all rounded-xl group w-full text-left cursor-pointer"
               >
                 <i className="fa-solid fa-rotate-right text-gray-500 group-hover:text-red-600 w-5 text-center"></i>
                 <span className="text-sm font-medium">Reset Quiz</span>
@@ -461,7 +461,7 @@ export default function Quiz() {
         <section className="flex-1 flex flex-col p-6 h-[calc(100vh-60px)] md:h-[calc(100vh-60px)] overflow-y-auto custom-scrollbar">
           <div className="max-w-7xl w-full mx-auto flex flex-col gap-6 px-8">
             <div className="header text-left">
-              <h1 className="text-2xl font-bold text-[#1a1c18]">Practice Quiz</h1>
+              <h1 className="text-2xl font-bold text-[#0b1c30]">Practice Quiz</h1>
               <p className="text-sm text-gray-500">Interactive quizzes tailored for Haryana Board students</p>
             </div>
 
@@ -475,20 +475,20 @@ export default function Quiz() {
                 timerSetting={timer}
               />
             ) : (
-              <div className="bg-white p-6 rounded-2xl border border-[#1a1c18]/10 flex flex-col gap-6 shadow-sm">
-                <h2 className="text-lg font-bold text-[#1a1c18] border-b border-gray-100 pb-3 flex items-center gap-2">
-                  <i className="fa-solid fa-sliders text-[#292b27]"></i> Configure Practice Quiz
+              <div className="bg-white p-6 rounded-2xl border border-[#0b1c30]/10 flex flex-col gap-6 shadow-sm">
+                <h2 className="text-lg font-bold text-[#0b1c30] border-b border-gray-100 pb-3 flex items-center gap-2">
+                  <i className="fa-solid fa-sliders text-[#424754]"></i> Configure Practice Quiz
                 </h2>
                 <p className="text-sm text-gray-600">
                   Tell CDF Guru exactly what subject, topic, or specific textbook chapter you want to practice.
                 </p>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-semibold text-[#1a1c18]">
+                  <label className="text-sm font-semibold text-[#0b1c30]">
                     What should this quiz test you on?
                   </label>
                   <textarea
-                    className="w-full p-4 rounded-xl border border-gray-200 bg-gray-50 focus:border-[#1a1c18] focus:ring-2 focus:ring-[#1a1c18]/5 text-sm text-[#1a1c18] outline-none transition-all resize-y min-h-[100px]"
+                    className="w-full p-4 rounded-xl border border-gray-200 bg-gray-50 focus:border-[#0b1c30] focus:ring-2 focus:ring-[#0b1c30]/5 text-sm text-[#0b1c30] outline-none transition-all resize-y min-h-[100px]"
                     placeholder="e.g. Chapter 3 of Haryana Board Class 10 Science (Metals and Non-metals), or 8th grade history lesson on Independence."
                     value={instructions}
                     onChange={(e) => setInstructions(e.target.value)}
@@ -498,8 +498,8 @@ export default function Quiz() {
 
                 <div className="flex flex-col md:flex-row gap-4 items-end justify-between">
                   <div className="flex flex-col gap-2 w-full md:w-1/3">
-                    <label className="text-sm font-semibold text-[#1a1c18]">Language</label>
-                    <select className="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-[#1a1c18] cursor-pointer outline-none focus:border-[#1a1c18]" value={language} onChange={(e) => setLanguage(e.target.value)} disabled={loading}>
+                    <label className="text-sm font-semibold text-[#0b1c30]">Language</label>
+                    <select className="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-[#0b1c30] cursor-pointer outline-none focus:border-[#0b1c30]" value={language} onChange={(e) => setLanguage(e.target.value)} disabled={loading}>
                       <option value="English">English</option>
                       <option value="Hindi">Hindi (हिंदी)</option>
                       <option value="Hinglish">Hinglish</option>
@@ -507,8 +507,8 @@ export default function Quiz() {
                   </div>
                   
                   <div className="flex flex-col gap-2 w-full md:w-1/3">
-                    <label className="text-sm font-semibold text-[#1a1c18]">Time Limit</label>
-                    <select className="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-[#1a1c18] cursor-pointer outline-none focus:border-[#1a1c18]" value={timer} onChange={(e) => setTimer(e.target.value)} disabled={loading}>
+                    <label className="text-sm font-semibold text-[#0b1c30]">Time Limit</label>
+                    <select className="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-[#0b1c30] cursor-pointer outline-none focus:border-[#0b1c30]" value={timer} onChange={(e) => setTimer(e.target.value)} disabled={loading}>
                       <option value="none">No Timer</option>
                       <option value="5">5 Minutes</option>
                       <option value="10">10 Minutes</option>
@@ -517,11 +517,11 @@ export default function Quiz() {
                   </div>
 
                   <div className="flex flex-col gap-2 w-full md:w-1/3">
-                    <label className="text-sm font-semibold text-[#1a1c18]">
+                    <label className="text-sm font-semibold text-[#0b1c30]">
                       Number of Questions
                     </label>
                     <select
-                      className="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-[#1a1c18] cursor-pointer outline-none focus:border-[#1a1c18]"
+                      className="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-[#0b1c30] cursor-pointer outline-none focus:border-[#0b1c30]"
                       value={numQuestions}
                       onChange={(e) => setNumQuestions(Number(e.target.value))}
                       disabled={loading}
@@ -537,11 +537,11 @@ export default function Quiz() {
                   <button
                     onClick={handleGenerateQuiz}
                     disabled={loading}
-                    className="w-full md:w-auto px-6 py-3.5 bg-[#292b27] hover:bg-[#1a1c18] text-[#f07723] rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full md:w-auto px-6 py-3.5 bg-[#424754] hover:bg-[#0b1c30] text-[#f47920] rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
                   >
                     {loading ? (
                       <>
-                        <span className="w-4 h-4 border-2 border-t-transparent border-[#f07723] rounded-full animate-spin"></span>
+                        <span className="w-4 h-4 border-2 border-t-transparent border-[#f47920] rounded-full animate-spin"></span>
                         Generating...
                       </>
                     ) : (
@@ -565,15 +565,15 @@ export default function Quiz() {
 
       {/* Daily Quests Modal */}
       {showQuestsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1a1c18]/60 backdrop-blur-sm transition-opacity">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0b1c30]/60 backdrop-blur-sm transition-opacity">
           <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-300">
-            <div className="p-6 border-b border-[#1a1c18]/10 flex justify-between items-center bg-[#dfd5bb]/20">
-              <h2 className="text-xl font-bold text-[#1a1c18] flex items-center gap-2">
+            <div className="p-6 border-b border-[#0b1c30]/10 flex justify-between items-center bg-[#f4f4ee]/20">
+              <h2 className="text-xl font-bold text-[#0b1c30] flex items-center gap-2">
                 <i className="fa-solid fa-award text-yellow-500"></i> Your Daily Quests
               </h2>
               <button 
                 onClick={() => setShowQuestsModal(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#1a1c18]/10 text-[#1a1c18]/60 hover:text-[#1a1c18] transition-colors cursor-pointer"
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#0b1c30]/10 text-[#0b1c30]/60 hover:text-[#0b1c30] transition-colors cursor-pointer"
               >
                 <i className="fa-solid fa-xmark text-lg"></i>
               </button>
@@ -586,20 +586,20 @@ export default function Quiz() {
               
               {questsLoading ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-4">
-                  <div className="w-10 h-10 border-4 border-[#f07723] border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-10 h-10 border-4 border-[#f47920] border-t-transparent rounded-full animate-spin"></div>
                   <p className="text-sm font-semibold text-gray-500 animate-pulse">Generating your custom quests...</p>
                 </div>
               ) : questsList.length > 0 ? (
                 <div className="flex flex-col gap-4">
                   {questsList.map((quest, idx) => (
-                    <div key={idx} className="bg-white p-5 rounded-2xl border border-[#1a1c18]/10 shadow-sm flex gap-4 hover:shadow-md transition-shadow group">
-                      <div className="w-12 h-12 rounded-xl bg-[#dfd5bb]/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                        <i className={`fa-solid ${quest.icon || 'fa-star'} text-[#292b27] text-xl`}></i>
+                    <div key={idx} className="bg-white p-5 rounded-2xl border border-[#0b1c30]/10 shadow-sm flex gap-4 hover:shadow-md transition-shadow group">
+                      <div className="w-12 h-12 rounded-xl bg-[#f4f4ee]/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                        <i className={`fa-solid ${quest.icon || 'fa-star'} text-[#424754] text-xl`}></i>
                       </div>
                       <div className="flex-1 flex flex-col gap-1.5">
                         <div className="flex justify-between items-start">
-                          <h3 className="font-bold text-[#1a1c18] text-base leading-tight">{quest.title}</h3>
-                          <span className="text-xs font-bold text-[#292b27] bg-[#f07723]/50 px-2.5 py-1 rounded-full whitespace-nowrap">
+                          <h3 className="font-bold text-[#0b1c30] text-base leading-tight">{quest.title}</h3>
+                          <span className="text-xs font-bold text-[#424754] bg-[#f47920]/50 px-2.5 py-1 rounded-full whitespace-nowrap">
                             <i className="fa-regular fa-clock mr-1"></i> {quest.estimatedTime}
                           </span>
                         </div>
