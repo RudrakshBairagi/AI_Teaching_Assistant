@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth, signInAnonymously } from "../lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { getUserSessions, deleteSessionFromFirestore } from "../lib/firestoreUtils";
+import { subscribeToUserSessions, deleteSessionFromFirestore } from "../lib/firestoreUtils";
 
 const AuthContext = createContext();
 
@@ -32,17 +32,21 @@ export function AuthProvider({ children }) {
 
   // Fetch sessions globally so it doesn't reload on page navigation
   useEffect(() => {
-    async function fetchSessions() {
+    let unsubscribeSessions;
+    if (user) {
       setIsLoadingSessions(true);
-      if (user) {
-        const userSessions = await getUserSessions(user.uid);
-        setSessions(userSessions);
-      } else {
-        setSessions([]);
-      }
+      unsubscribeSessions = subscribeToUserSessions(user.uid, (realtimeSessions) => {
+        setSessions(realtimeSessions);
+        setIsLoadingSessions(false);
+      });
+    } else {
+      setSessions([]);
       setIsLoadingSessions(false);
     }
-    fetchSessions();
+    
+    return () => {
+      if (unsubscribeSessions) unsubscribeSessions();
+    };
   }, [user]);
 
   const removeSession = async (sessionId) => {

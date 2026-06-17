@@ -1,5 +1,5 @@
 import { db } from "./firebase";
-import { collection, doc, setDoc, getDocs, getDoc, deleteDoc, query, orderBy, serverTimestamp } from "firebase/firestore";
+import { collection, doc, setDoc, getDocs, getDoc, deleteDoc, query, orderBy, serverTimestamp, onSnapshot } from "firebase/firestore";
 
 // Save a session
 export async function saveSessionToFirestore(uid, sessionId, conversationHistory) {
@@ -32,6 +32,21 @@ export async function getUserSessions(uid) {
   });
   
   return sessions;
+}
+
+// Subscribe to sessions in real-time
+export function subscribeToUserSessions(uid, callback) {
+  if (!uid) return () => {};
+  const sessionsRef = collection(db, "users", uid, "sessions");
+  const q = query(sessionsRef, orderBy("updatedAt", "desc"));
+  
+  return onSnapshot(q, (snapshot) => {
+    const sessions = [];
+    snapshot.forEach(doc => {
+      sessions.push({ id: doc.id, ...doc.data() });
+    });
+    callback(sessions);
+  });
 }
 
 // Fetch a specific session
