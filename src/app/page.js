@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Lottie from "lottie-react";
 import avatarAnimation from "../../public/avatar.json";
+import Navbar from "../components/Navbar";
 
 export default function Home() {
   const [conversationHistory, setConversationHistory] = useState([]);
@@ -228,6 +229,8 @@ If no image makes sense, use a general relevant keyword.`;
         <h1>CDF Guru</h1>
         <p>Your AI Teaching Assistant</p>
       </div>
+
+      <Navbar />
 
       <div className="main-layout">
         <div className="teacher-area">
