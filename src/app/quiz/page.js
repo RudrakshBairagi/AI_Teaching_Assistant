@@ -268,6 +268,12 @@ export default function Quiz() {
     return () => unsubscribe();
   }, []);
 
+  // Initialize language from settings
+  useEffect(() => {
+    const savedLang = localStorage.getItem("appLanguage");
+    if (savedLang) setLanguage(savedLang);
+  }, []);
+
   // Load chat context if navigating from Tutor page
   useEffect(() => {
     const context = localStorage.getItem("quizContext");

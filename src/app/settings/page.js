@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
 
@@ -10,6 +10,17 @@ export default function Settings() {
   const [emailNotifs, setEmailNotifs] = useState(true);
   const [pushNotifs, setPushNotifs] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem("appLanguage");
+    if (savedLanguage) setLanguage(savedLanguage);
+  }, []);
+
+  const handleLanguageChange = (e) => {
+    const newLang = e.target.value;
+    setLanguage(newLang);
+    localStorage.setItem("appLanguage", newLang);
+  };
 
   const handleLogout = () => {
     // Mock logout logic: redirect to the home page (which could be the login page later)
@@ -50,7 +61,7 @@ export default function Settings() {
               <select 
                 className="w-full md:w-48 p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-semibold text-[#0b1c30] cursor-pointer outline-none focus:border-[#0b1c30] transition-colors"
                 value={language}
-                onChange={(e) => setLanguage(e.target.value)}
+                onChange={handleLanguageChange}
               >
                 <option value="English">English</option>
                 <option value="Hindi">Hindi (हिंदी)</option>
