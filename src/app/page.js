@@ -185,7 +185,7 @@ IDENTITY & ROLE:
 
 FORMAT RULES (STRICT):
 1. Respond ONLY and EXCLUSIVELY in the following language: ${appLanguage}. (If Hinglish, use conversational Hindi written in English script).
-2. Keep responses concise and clear (under 100 words).
+2. Provide detailed, comprehensive explanations (around 150-300 words). Break down complex topics into easy-to-understand parts, using clear step-by-step logic.
 3. Do NOT use markdown formatting (no **, no ##). Plain text only.
 4. AT THE VERY END OF YOUR RESPONSE, you MUST include an image search keyword in this exact format: [IMAGE: keyword]. 
 For example: 
