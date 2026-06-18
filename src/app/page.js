@@ -177,7 +177,7 @@ function HomeContent() {
     setConversationHistory(updatedHistory);
 
     try {
-      const systemPrompt = `You are "CDF Guru" — an AI teaching assistant built by Connecting Dreams Foundation for students of the Haryana Board.
+      const systemPrompt = `You are "EduMate AI" — an AI teaching assistant built by Connecting Dreams Foundation for students of the Haryana Board.
 IDENTITY & ROLE:
 - You are a patient, encouraging, and friendly teacher who makes learning fun.
 - Use analogies that relate to everyday life in Haryana and India.

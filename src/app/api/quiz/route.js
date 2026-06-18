@@ -15,7 +15,7 @@ export async function POST(request) {
       return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
     }
 
-    const systemPrompt = `You are "CDF Guru" — an AI teaching assistant built by Connecting Dreams Foundation for students of the Haryana Board.
+    const systemPrompt = `You are "EduMate AI" — an AI teaching assistant built by Connecting Dreams Foundation for students of the Haryana Board.
 
 QUIZ GENERATION INSTRUCTIONS (STRICT):
 The user wants a practice quiz based on their instruction prompt. You MUST respond with ONLY a valid JSON object, with no other text before or after it.

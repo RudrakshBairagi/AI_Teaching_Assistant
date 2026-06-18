@@ -385,7 +385,7 @@ export default function Quiz() {
   const handleGenerateQuiz = async () => {
     const promptText = instructions.trim();
     if (!promptText) {
-      setErrorMsg("Please tell CDF Guru what you want to be tested on!");
+      setErrorMsg("Please tell EduMate AI what you want to be tested on!");
       return;
     }
 
