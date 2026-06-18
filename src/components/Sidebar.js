@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
@@ -9,6 +10,7 @@ export default function Sidebar({ handleGenerateQuests, clearChat, handleCreateQ
   const pathname = usePathname();
   const { sessions, isLoadingSessions, removeSession } = useAuth();
   const { t } = useLanguage();
+  const [isChatsOpen, setIsChatsOpen] = useState(true);
 
   const handleDeleteSession = async (e, sessionId) => {
     e.preventDefault();
@@ -59,18 +61,32 @@ export default function Sidebar({ handleGenerateQuests, clearChat, handleCreateQ
         {isLoadingSessions ? (
           <>
             <div className="h-px bg-theme-sidebar/10 my-2"></div>
-            <p className="text-xs font-bold text-theme-text/50 uppercase tracking-wider px-4 mt-2 mb-2">{t("sidebar.recentChats")}</p>
-            <div className="flex flex-col gap-2 px-4">
-              <div className="h-6 bg-theme-sidebar/10 rounded animate-pulse w-3/4"></div>
-              <div className="h-6 bg-theme-sidebar/10 rounded animate-pulse w-full"></div>
-              <div className="h-6 bg-theme-sidebar/10 rounded animate-pulse w-5/6"></div>
+            <div 
+              className="flex items-center justify-between px-4 mt-2 mb-2 cursor-pointer group"
+              onClick={() => setIsChatsOpen(!isChatsOpen)}
+            >
+              <p className="text-xs font-bold text-theme-text/50 uppercase tracking-wider group-hover:text-theme-text/80 transition-colors">{t("sidebar.recentChats")}</p>
+              <i className={`fa-solid fa-chevron-${isChatsOpen ? 'down' : 'right'} text-xs text-theme-text/40 group-hover:text-theme-text/70 transition-all`}></i>
             </div>
+            {isChatsOpen && (
+              <div className="flex flex-col gap-2 px-4 mt-1">
+                <div className="h-6 bg-theme-sidebar/10 rounded animate-pulse w-3/4"></div>
+                <div className="h-6 bg-theme-sidebar/10 rounded animate-pulse w-full"></div>
+                <div className="h-6 bg-theme-sidebar/10 rounded animate-pulse w-5/6"></div>
+              </div>
+            )}
           </>
         ) : sessions.length > 0 && (
           <>
             <div className="h-px bg-theme-sidebar/10 my-2"></div>
-            <p className="text-xs font-bold text-theme-text/50 uppercase tracking-wider px-4 mt-2 mb-1">{t("sidebar.recentChats")}</p>
-            {sessions.map(session => (
+            <div 
+              className="flex items-center justify-between px-4 mt-2 mb-1 cursor-pointer group"
+              onClick={() => setIsChatsOpen(!isChatsOpen)}
+            >
+              <p className="text-xs font-bold text-theme-text/50 uppercase tracking-wider group-hover:text-theme-text/80 transition-colors">{t("sidebar.recentChats")}</p>
+              <i className={`fa-solid fa-chevron-${isChatsOpen ? 'down' : 'right'} text-xs text-theme-text/40 group-hover:text-theme-text/70 transition-all`}></i>
+            </div>
+            {isChatsOpen && sessions.map(session => (
               <div key={session.id} className="flex items-center justify-between group px-4 py-2 hover:bg-theme-sidebar/5 rounded-xl transition-all">
                 <Link href={`/?sessionId=${session.id}`} className="flex-1 overflow-hidden">
                   <p className="text-sm text-theme-text/80 truncate font-medium">{session.title}</p>
