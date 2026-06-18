@@ -26,6 +26,7 @@ function HomeContent() {
   const [loading, setLoading] = useState(false);
   const [isTalking, setIsTalking] = useState(false);
   const [listening, setListening] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
   
   const [showQuestsModal, setShowQuestsModal] = useState(false);
   const [questsLoading, setQuestsLoading] = useState(false);
@@ -229,7 +230,9 @@ If no image makes sense, use a general relevant keyword.`;
       }
 
       // Generate Voice
-      await speakText(aiText);
+      if (voiceEnabled) {
+        await speakText(aiText);
+      }
 
     } catch (error) {
       console.error(error);
@@ -519,6 +522,14 @@ If no image makes sense, use a general relevant keyword.`;
 
             {/* Input Box */}
             <div className="flex items-center gap-2 bg-theme-card p-1.5 rounded-full border border-theme-border focus-within:border-theme-border focus-within:ring-2 focus-within:ring-[#0b1c30]/5 transition-all shadow-inner">
+              <button 
+                onClick={() => setVoiceEnabled(!voiceEnabled)}
+                title={voiceEnabled ? "Mute Voice" : "Enable Voice"}
+                className={`w-9 h-9 flex items-center justify-center transition-colors rounded-full cursor-pointer ${voiceEnabled ? 'text-[#f47920] hover:bg-theme-sidebar/10' : 'text-theme-text/40 hover:text-theme-text hover:bg-theme-sidebar/10'}`}
+              >
+                <i className={`fa-solid ${voiceEnabled ? 'fa-volume-high' : 'fa-volume-xmark'}`}></i>
+              </button>
+              
               <button 
                 onClick={clearChat}
                 title="New Chat"
