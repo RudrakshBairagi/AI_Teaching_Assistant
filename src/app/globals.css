@@ -2,40 +2,56 @@
 
 
 @theme {
-  --color-sidebar: #0b1c30;
-  --color-primary: #f47920;
-  --color-primary-foreground: #121410;
-  --color-surface: #121410;
-  --color-surface-container-low: #0b1c30;
-  --color-surface-container: #1e201c;
-  --color-surface-container-high: #424754;
-  --color-surface-bright: #727785;
-  --color-success: #10B981;
-  --color-danger: #EF4444;
-  --color-warning: #F59E0B;
-  --color-glass: rgba(26, 28, 24, 0.7);
-
-  --shadow-glass: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-  --shadow-card: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --color-theme-bg: var(--theme-bg);
+  --color-theme-text: var(--theme-text);
+  --color-theme-text-muted: var(--theme-text-muted);
+  --color-theme-card: var(--theme-card);
+  --color-theme-border: var(--theme-border);
+  --color-theme-sidebar: var(--theme-sidebar);
 }
 
-
 :root {
+  --theme-bg: #f4f4ee;
+  --theme-text: #0b1c30;
+  --theme-text-muted: #5b5f56;
+  --theme-card: #ffffff;
+  --theme-border: rgba(11, 28, 48, 0.1);
+  --theme-sidebar: #ffb266;
+  
   --primary: #424754;
   --secondary: #f4f4ee;
   --bg-color: #f4f4ee;
   --bg-gradient: linear-gradient(135deg, #f4f4ee, #f4f4ee);
   --text-main: #0b1c30;
   --text-muted: #5b5f56;
-  --card-bg: rgba(26, 28, 24, 0.05);
-  --glass-border: rgba(26, 28, 24, 0.1);
+  --card-bg: var(--card-bg);
+  --glass-border: var(--glass-border);
   --accent: #f47920;
+}
+
+.dark {
+  --theme-bg: #121410;
+  --theme-text: #f4f4ee;
+  --theme-text-muted: #a0a49c;
+  --theme-card: #1e201c;
+  --theme-border: rgba(244, 244, 238, 0.1);
+  --theme-sidebar: #1e201c;
+  
+  --primary: #5b5f56;
+  --secondary: #121410;
+  --bg-color: #121410;
+  --bg-gradient: linear-gradient(135deg, #121410, #1e201c);
+  --text-main: #f4f4ee;
+  --text-muted: #a0a49c;
+  --card-bg: rgba(244, 244, 238, 0.05);
+  --glass-border: rgba(244, 244, 238, 0.1);
 }
 
 body {
   font-family: 'Manrope', sans-serif;
-  background-color: #f4f4ee;
-  color: #0b1c30;
+  background-color: var(--theme-bg);
+  color: var(--theme-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -46,7 +62,7 @@ body {
   background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(26, 28, 24, 0.2);
+  background: var(--glass-border);
   border-radius: 10px;
 }
 
@@ -54,13 +70,13 @@ body {
 .container {
   max-width: 900px;
   width: 100%;
-  background: rgba(26, 28, 24, 0.03);
+  background: var(--card-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
   border-radius: 24px;
   padding: 40px;
-  box-shadow: 0 8px 32px rgba(26, 28, 24, 0.1);
+  box-shadow: 0 8px 32px var(--glass-border);
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -76,14 +92,14 @@ body {
   font-family: 'Outfit', sans-serif;
   font-weight: 800;
   font-size: 2.5rem;
-  background: -webkit-linear-gradient(45deg, #0b1c30, #5b5f56);
+  background: -webkit-linear-gradient(45deg, var(--theme-text), var(--theme-text-muted));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 8px;
 }
 
 .header p {
-  color: var(--text-muted);
+  color: var(--theme-text-muted);
   font-size: 1.1rem;
 }
 
@@ -168,12 +184,12 @@ body {
 
 .box:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(26, 28, 24, 0.05);
+  box-shadow: 0 4px 15px var(--card-bg);
 }
 
 .label {
   font-weight: 600;
-  color: #0b1c30;
+  color: var(--theme-text);
   margin-bottom: 8px;
   font-size: 0.9rem;
   text-transform: uppercase;
@@ -185,7 +201,7 @@ body {
   max-width: 100%;
   border-radius: 12px;
   border: 2px solid var(--glass-border);
-  box-shadow: 0 4px 15px rgba(26, 28, 24, 0.1);
+  box-shadow: 0 4px 15px var(--glass-border);
   display: block;
 }
 
@@ -202,8 +218,8 @@ body {
   padding: 15px 20px;
   border-radius: 30px;
   border: 1px solid var(--glass-border);
-  background: rgba(26, 28, 24, 0.05);
-  color: #0b1c30;
+  background: var(--card-bg);
+  color: var(--theme-text);
   font-size: 1rem;
   font-family: inherit;
   outline: none;
@@ -211,9 +227,9 @@ body {
 }
 
 .input-field:focus {
-  background: rgba(26, 28, 24, 0.08);
-  border-color: #0b1c30;
-  box-shadow: 0 0 0 3px rgba(26, 28, 24, 0.1);
+  background: var(--glass-border);
+  border-color: var(--theme-text);
+  box-shadow: 0 0 0 3px var(--glass-border);
 }
 
 button {
@@ -236,19 +252,19 @@ button {
 }
 
 .btn-primary:hover {
-  background: #0b1c30;
+  background: var(--theme-text);
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(26, 28, 24, 0.2);
+  box-shadow: 0 5px 15px var(--glass-border);
 }
 
 .btn-secondary {
-  background: rgba(26, 28, 24, 0.05);
-  color: #0b1c30;
+  background: var(--card-bg);
+  color: var(--theme-text);
   border: 1px solid var(--glass-border);
 }
 
 .btn-secondary:hover {
-  background: rgba(26, 28, 24, 0.1);
+  background: var(--glass-border);
   transform: translateY(-2px);
 }
 
@@ -316,13 +332,13 @@ button:disabled {
 .quiz-topic {
   font-weight: 600;
   font-size: 1.2rem;
-  color: #0b1c30;
+  color: var(--theme-text);
 }
 
 .quiz-progress {
   font-size: 0.85rem;
-  color: var(--text-muted);
-  background: rgba(26, 28, 24, 0.05);
+  color: var(--theme-text-muted);
+  background: var(--card-bg);
   padding: 4px 12px;
   border-radius: 20px;
 }
@@ -330,7 +346,7 @@ button:disabled {
 .quiz-progress-bar {
   width: 100%;
   height: 6px;
-  background: rgba(26, 28, 24, 0.1);
+  background: var(--glass-border);
   border-radius: 3px;
   overflow: hidden;
 }
@@ -347,7 +363,7 @@ button:disabled {
   font-weight: 600;
   line-height: 1.5;
   padding: 10px 0;
-  color: #0b1c30;
+  color: var(--theme-text);
 }
 
 .quiz-options {
@@ -362,8 +378,8 @@ button:disabled {
   padding: 0;
   border-radius: 12px;
   border: 1px solid var(--glass-border);
-  background: rgba(26, 28, 24, 0.03);
-  color: #0b1c30;
+  background: var(--card-bg);
+  color: var(--theme-text);
   font-size: 1rem;
   text-align: left;
   cursor: pointer;
@@ -388,8 +404,8 @@ button:disabled {
 }
 
 .quiz-option:hover:not(.correct):not(.wrong):not(.dimmed) {
-  background: rgba(26, 28, 24, 0.08);
-  border-color: #0b1c30;
+  background: var(--glass-border);
+  border-color: var(--theme-text);
   transform: translateX(4px);
 }
 
@@ -405,12 +421,12 @@ button:disabled {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: rgba(26, 28, 24, 0.1);
+  background: var(--glass-border);
   font-weight: 700;
   font-size: 0.85rem;
   flex-shrink: 0;
   transition: all 0.25s ease;
-  color: #0b1c30;
+  color: var(--theme-text);
 }
 
 .quiz-option.correct {
@@ -438,9 +454,9 @@ button:disabled {
 
 .quiz-option-explanation {
   padding: 12px 18px 14px;
-  border-top: 1px solid rgba(26, 28, 24, 0.08);
+  border-top: 1px solid var(--glass-border);
   font-size: 0.9rem;
-  color: var(--text-muted);
+  color: var(--theme-text-muted);
   line-height: 1.5;
   background: rgba(16, 185, 129, 0.05);
   animation: slideDown 0.3s ease;
@@ -472,7 +488,7 @@ button:disabled {
 
 .quiz-results h2 {
   font-size: 1.6rem;
-  background: -webkit-linear-gradient(45deg, #0b1c30, #5b5f56);
+  background: -webkit-linear-gradient(45deg, var(--theme-text), var(--theme-text-muted));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -480,12 +496,12 @@ button:disabled {
 .quiz-score-big {
   font-size: 3rem;
   font-weight: 800;
-  color: #0b1c30;
+  color: var(--theme-text);
 }
 
 .quiz-score-percent {
   font-size: 1.2rem;
-  color: var(--text-muted);
+  color: var(--theme-text-muted);
 }
 
 @keyframes fadeSlideIn {
@@ -503,19 +519,19 @@ button:disabled {
   display: flex;
   gap: 15px;
   justify-content: center;
-  background: rgba(26, 28, 24, 0.03);
+  background: var(--card-bg);
   border: 1px solid var(--glass-border);
   border-radius: 50px;
   padding: 8px;
   margin-bottom: 20px;
   align-self: center;
   width: fit-content;
-  box-shadow: 0 4px 15px rgba(26, 28, 24, 0.05);
+  box-shadow: 0 4px 15px var(--card-bg);
 }
 
 .nav-link {
   text-decoration: none;
-  color: var(--text-muted);
+  color: var(--theme-text-muted);
   font-weight: 600;
   font-size: 1rem;
   padding: 10px 24px;
@@ -527,8 +543,8 @@ button:disabled {
 }
 
 .nav-link:hover {
-  color: var(--text-main);
-  background: rgba(26, 28, 24, 0.05);
+  color: var(--theme-text);
+  background: var(--card-bg);
 }
 
 .nav-link.active {
@@ -548,6 +564,6 @@ select.input-field {
 }
 
 select.input-field option {
-  background: #f4f4ee;
-  color: #0b1c30;
+  background: var(--theme-bg);
+  color: var(--theme-text);
 }

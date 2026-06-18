@@ -8,10 +8,12 @@ import Sidebar from "../components/Sidebar";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import { saveSessionToFirestore, getSessionById } from "../lib/firestoreUtils";
 
 function HomeContent() {
   const { user } = useAuth();
+  const { t, appLanguage } = useLanguage();
   const [sessionId, setSessionId] = useState(null);
 
   const [conversationHistory, setConversationHistory] = useState([
@@ -175,8 +177,6 @@ function HomeContent() {
     setConversationHistory(updatedHistory);
 
     try {
-      const appLanguage = localStorage.getItem("appLanguage") || "English";
-
       const systemPrompt = `You are "CDF Guru" — an AI teaching assistant built by Connecting Dreams Foundation for students of the Haryana Board.
 IDENTITY & ROLE:
 - You are a patient, encouraging, and friendly teacher who makes learning fun.
@@ -385,7 +385,7 @@ If no image makes sense, use a general relevant keyword.`;
   const activeVisualAid = conversationHistory.slice().reverse().find(m => m.role === "assistant" && m.image)?.image || null;
 
   return (
-    <div className="h-screen flex flex-col bg-[#f4f4ee] text-[#0b1c30] antialiased overflow-hidden">
+    <div className="h-screen flex flex-col bg-theme-bg text-theme-text antialiased overflow-hidden">
       <Navbar isTalking={isTalking} mobileLottieRef={mobileLottieRef} />
 
       <main className="flex-1 flex flex-col md:flex-row w-full relative">
@@ -399,11 +399,11 @@ If no image makes sense, use a general relevant keyword.`;
         <section className="flex-1 flex flex-col relative h-[calc(100vh-60px)] md:h-[calc(100vh-60px)]">
           
           {/* AI Avatar Header (Desktop & Large screens) */}
-          <div className={`hidden md:flex items-center py-4 border-b border-[#0b1c30]/10 bg-[#f4f4ee]/80 backdrop-blur-md z-10 sticky top-0 shrink-0 transition-all duration-700 ease-in-out ${activeVisualAid ? 'justify-between px-16' : 'justify-center'}`}>
+          <div className={`hidden md:flex items-center py-4 border-b border-theme-border bg-theme-bg/80 backdrop-blur-md z-10 sticky top-0 shrink-0 transition-all duration-700 ease-in-out ${activeVisualAid ? 'justify-between px-16' : 'justify-center'}`}>
             
             {/* Avatar Section */}
             <div className="flex flex-col items-center transition-all duration-700 ease-in-out">
-              <div className="w-80 h-80 flex items-center justify-center overflow-hidden bg-white rounded-full border border-[#0b1c30]/10 shadow-sm transition-all duration-700">
+              <div className="w-80 h-80 flex items-center justify-center overflow-hidden bg-theme-card rounded-full border border-theme-border shadow-sm transition-all duration-700">
                 <Lottie
                   lottieRef={lottieRef}
                   animationData={avatarAnimation}
@@ -412,7 +412,7 @@ If no image makes sense, use a general relevant keyword.`;
                   style={{ width: 400, height: 400 }}
                 />
               </div>
-              <p className="text-xs font-bold text-[#0b1c30] mt-2 tracking-wide uppercase transition-all duration-700">
+              <p className="text-xs font-bold text-theme-text mt-2 tracking-wide uppercase transition-all duration-700">
                 {isTalking ? "Speaking..." : "Ready to Help"}
               </p>
             </div>
@@ -420,9 +420,9 @@ If no image makes sense, use a general relevant keyword.`;
             {/* Visual Aid Section */}
             <div className={`transition-all duration-700 ease-in-out flex-shrink-0 flex items-center justify-center ${activeVisualAid ? 'opacity-100 scale-100 translate-x-0 w-[400px] max-w-sm' : 'opacity-0 scale-90 translate-x-10 w-0 overflow-hidden'}`}>
               {activeVisualAid && (
-                <div className="rounded-3xl overflow-hidden border border-[#0b1c30]/10 shadow-lg bg-white relative group w-full">
+                <div className="rounded-3xl overflow-hidden border border-theme-border shadow-lg bg-theme-card relative group w-full">
                   <a href={activeVisualAid} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
-                    <img src={activeVisualAid} alt="Visual Aid" className="w-full h-auto object-contain max-h-72 bg-[#0b1c30]/5 group-hover:scale-[1.02] transition-transform duration-500" />
+                    <img src={activeVisualAid} alt="Visual Aid" className="w-full h-auto object-contain max-h-72 bg-theme-sidebar/5 group-hover:scale-[1.02] transition-transform duration-500" />
                     <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity flex justify-between items-center">
                        <p className="text-sm text-white font-medium flex items-center gap-2"><i className="fa-brands fa-wikipedia-w"></i> Wikipedia</p>
                        <i className="fa-solid fa-expand text-white text-sm"></i>
@@ -440,12 +440,20 @@ If no image makes sense, use a general relevant keyword.`;
               if (message.role === "assistant") {
                 return (
                   <div key={idx} className="flex gap-3 max-w-[85%] md:max-w-[70%] animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="w-10 h-10 rounded-xl bg-[#f47920] text-[#121410] flex-shrink-0 flex items-center justify-center shadow-sm">
+                    <div className="w-10 h-10 rounded-xl bg-[#f47920] text-theme-bg flex-shrink-0 flex items-center justify-center shadow-sm">
                       <i className="fa-solid fa-robot"></i>
                     </div>
                     <div className="flex flex-col gap-3">
-                      <div className="bg-white p-4 rounded-2xl shadow-sm border border-[#0b1c30]/10 rounded-tl-none">
-                        <p className="text-sm text-[#0b1c30] leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                      <div className="bg-theme-card p-4 rounded-2xl shadow-sm border border-theme-border rounded-tl-none relative group">
+                        <p className="text-sm text-theme-text leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                        
+                        <button 
+                          onClick={() => speakText(message.content)}
+                          className="absolute -right-10 top-2 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-full bg-theme-card border border-theme-border text-theme-text/50 hover:text-[#f47920] shadow-sm flex items-center justify-center cursor-pointer"
+                          title="Replay Audio"
+                        >
+                          <i className="fa-solid fa-volume-high text-xs"></i>
+                        </button>
                       </div>
                       
                       {/* Visual aid moved to header */}
@@ -472,10 +480,10 @@ If no image makes sense, use a general relevant keyword.`;
 
             {loading && (
               <div className="flex gap-3 max-w-[85%] md:max-w-[70%] animate-pulse">
-                <div className="w-10 h-10 rounded-xl bg-[#f47920] text-[#121410] flex-shrink-0 flex items-center justify-center shadow-sm">
+                <div className="w-10 h-10 rounded-xl bg-[#f47920] text-theme-bg flex-shrink-0 flex items-center justify-center shadow-sm">
                   <i className="fa-solid fa-robot"></i>
                 </div>
-                <div className="bg-white p-4 rounded-2xl shadow-sm border border-[#0b1c30]/10 rounded-tl-none">
+                <div className="bg-theme-card p-4 rounded-2xl shadow-sm border border-theme-border rounded-tl-none">
                   <div className="flex gap-1 items-center py-1">
                     <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></span>
                     <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:0.2s]"></span>
@@ -489,7 +497,7 @@ If no image makes sense, use a general relevant keyword.`;
           </div>
 
           {/* Interaction Area */}
-          <div className="bg-[#f4f4ee]/80 backdrop-blur-md px-4 py-4 border-t border-[#0b1c30]/10 sticky bottom-0 z-40">
+          <div className="bg-theme-bg/80 backdrop-blur-md px-4 py-4 border-t border-theme-border sticky bottom-0 z-40">
             {/* Quick Ask Chips */}
             <div className="flex gap-2 overflow-x-auto pb-3 custom-scrollbar">
               {[
@@ -510,18 +518,18 @@ If no image makes sense, use a general relevant keyword.`;
             </div>
 
             {/* Input Box */}
-            <div className="flex items-center gap-2 bg-white p-1.5 rounded-full border border-[#0b1c30]/10 focus-within:border-[#0b1c30] focus-within:ring-2 focus-within:ring-[#0b1c30]/5 transition-all shadow-inner">
+            <div className="flex items-center gap-2 bg-theme-card p-1.5 rounded-full border border-theme-border focus-within:border-theme-border focus-within:ring-2 focus-within:ring-[#0b1c30]/5 transition-all shadow-inner">
               <button 
                 onClick={clearChat}
                 title="New Chat"
-                className="w-9 h-9 flex items-center justify-center text-[#0b1c30]/60 hover:text-[#0b1c30] transition-colors rounded-full hover:bg-[#0b1c30]/10 cursor-pointer"
+                className="w-9 h-9 flex items-center justify-center text-theme-text/60 hover:text-theme-text transition-colors rounded-full hover:bg-theme-sidebar/10 cursor-pointer"
               >
                 <i className="fa-solid fa-rotate-right"></i>
               </button>
               
               <input
-                className="flex-1 bg-transparent border-none focus:ring-0 text-sm text-[#0b1c30] py-2 px-2 placeholder-gray-500 outline-none"
-                placeholder="Ask EduMate anything..."
+                className="flex-1 bg-transparent border-none focus:ring-0 text-sm text-theme-text py-2 px-2 placeholder-gray-500 outline-none"
+                placeholder={listening ? t("chat.voice.listening") : t("chat.placeholder")}
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
@@ -547,7 +555,7 @@ If no image makes sense, use a general relevant keyword.`;
                 <button
                   onClick={() => handleSend()}
                   disabled={loading || !inputValue.trim()}
-                  className="w-9 h-9 rounded-full bg-[#f47920] text-[#121410] flex items-center justify-center shadow-md hover:bg-[#e06312] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-9 h-9 rounded-full bg-[#f47920] text-theme-bg flex items-center justify-center shadow-md hover:bg-[#e06312] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <i className="fa-solid fa-paper-plane text-xs"></i>
                 </button>
@@ -559,51 +567,51 @@ If no image makes sense, use a general relevant keyword.`;
 
       {/* Daily Quests Modal */}
       {showQuestsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0b1c30]/60 backdrop-blur-sm transition-opacity">
-          <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-300">
-            <div className="p-6 border-b border-[#0b1c30]/10 flex justify-between items-center bg-[#f4f4ee]/20">
-              <h2 className="text-xl font-bold text-[#0b1c30] flex items-center gap-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-theme-sidebar/60 backdrop-blur-sm transition-opacity">
+          <div className="bg-theme-card rounded-3xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+            <div className="p-6 border-b border-theme-border flex justify-between items-center bg-theme-bg/20">
+              <h2 className="text-xl font-bold text-theme-text flex items-center gap-2">
                 <i className="fa-solid fa-award text-yellow-500"></i> Your Daily Quests
               </h2>
               <button 
                 onClick={() => setShowQuestsModal(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#0b1c30]/10 text-[#0b1c30]/60 hover:text-[#0b1c30] transition-colors cursor-pointer"
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-theme-sidebar/10 text-theme-text/60 hover:text-theme-text transition-colors cursor-pointer"
               >
                 <i className="fa-solid fa-xmark text-lg"></i>
               </button>
             </div>
             
-            <div className="p-6 overflow-y-auto custom-scrollbar flex-1 bg-gray-50/50">
-              <p className="text-sm text-gray-600 mb-6 font-medium">
+            <div className="p-6 overflow-y-auto custom-scrollbar flex-1 bg-theme-card/50">
+              <p className="text-sm text-theme-text-muted mb-6 font-medium">
                 Complete these personalized, offline activities after school to master what you learned today!
               </p>
               
               {questsLoading ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-4">
                   <div className="w-10 h-10 border-4 border-[#f47920] border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-sm font-semibold text-gray-500 animate-pulse">Generating your custom quests...</p>
+                  <p className="text-sm font-semibold text-theme-text-muted animate-pulse">Generating your custom quests...</p>
                 </div>
               ) : questsList.length > 0 ? (
                 <div className="flex flex-col gap-4">
                   {questsList.map((quest, idx) => (
-                    <div key={idx} className="bg-white p-5 rounded-2xl border border-[#0b1c30]/10 shadow-sm flex gap-4 hover:shadow-md transition-shadow group">
-                      <div className="w-12 h-12 rounded-xl bg-[#f4f4ee]/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <div key={idx} className="bg-theme-card p-5 rounded-2xl border border-theme-border shadow-sm flex gap-4 hover:shadow-md transition-shadow group">
+                      <div className="w-12 h-12 rounded-xl bg-theme-bg/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                         <i className={`fa-solid ${quest.icon || 'fa-star'} text-[#424754] text-xl`}></i>
                       </div>
                       <div className="flex-1 flex flex-col gap-1.5">
                         <div className="flex justify-between items-start">
-                          <h3 className="font-bold text-[#0b1c30] text-base leading-tight">{quest.title}</h3>
+                          <h3 className="font-bold text-theme-text text-base leading-tight">{quest.title}</h3>
                           <span className="text-xs font-bold text-[#424754] bg-[#f47920]/50 px-2.5 py-1 rounded-full whitespace-nowrap">
                             <i className="fa-regular fa-clock mr-1"></i> {quest.estimatedTime}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-600 leading-relaxed">{quest.description}</p>
+                        <p className="text-sm text-theme-text-muted leading-relaxed">{quest.description}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-gray-500 text-sm">Failed to load quests. Please try again.</div>
+                <div className="text-center py-8 text-theme-text-muted text-sm">Failed to load quests. Please try again.</div>
               )}
             </div>
           </div>
@@ -615,7 +623,7 @@ If no image makes sense, use a general relevant keyword.`;
 
 export default function Home() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#f4f4ee]">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-theme-bg">Loading...</div>}>
       <HomeContent />
     </Suspense>
   );

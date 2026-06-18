@@ -1,5 +1,7 @@
 import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
+import { LanguageProvider } from "../context/LanguageContext";
+import { ThemeProvider } from "../context/ThemeContext";
 
 export const metadata = {
   title: "EduMate AI - AI Tutor Chat",
@@ -23,7 +25,11 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <AuthProvider>
-          {children}
+          <ThemeProvider>
+            <LanguageProvider>
+              {children}
+            </LanguageProvider>
+          </ThemeProvider>
         </AuthProvider>
       </body>
     </html>
