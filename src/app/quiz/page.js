@@ -10,26 +10,22 @@ import { useLanguage } from "../../context/LanguageContext";
 
 function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled, timerSetting, reviewMode }) {
   const { t } = useLanguage();
+  const [viewMode, setViewMode] = useState("single");
   const [currentQ, setCurrentQ] = useState(0);
-  const [selected, setSelected] = useState(reviewMode ? quizData.userAnswers[0] : null);
-  const [answered, setAnswered] = useState(reviewMode ? true : false);
   const [score, setScore] = useState(reviewMode ? quizData.score : 0);
   const [finished, setFinished] = useState(false);
-  const [userAnswers, setUserAnswers] = useState(reviewMode ? quizData.userAnswers : []);
+  const [userAnswers, setUserAnswers] = useState(reviewMode ? quizData.userAnswers : new Array(quizData.questions.length).fill(undefined));
   const [hasSaved, setHasSaved] = useState(false);
 
   const initialTime = timerSetting === "none" ? null : parseInt(timerSetting) * 60;
   const [timeLeft, setTimeLeft] = useState(initialTime);
 
+  const questions = quizData.questions;
+
   useEffect(() => {
     if (reviewMode || timeLeft === null || finished) return;
     if (timeLeft <= 0) {
-      setFinished(true);
-      if (voiceEnabled) speakText("Time is up! Let's see your results.");
-      if (!hasSaved) {
-        saveQuizToFirestore(crypto.randomUUID(), quizData, score, userAnswers);
-        setHasSaved(true);
-      }
+      finishQuiz();
       return;
     }
     const timerId = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
@@ -42,26 +38,28 @@ function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled, time
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
-  const questions = quizData.questions;
-  const q = questions[currentQ];
+  const lastSpokenQRef = useRef(-1);
 
   // Auto-speak the question when it is loaded
   useEffect(() => {
-    if (q && voiceEnabled && !reviewMode) {
-      speakText(`Question ${currentQ + 1}: ${q.question}`);
+    if (viewMode === "single" && questions[currentQ] && voiceEnabled && !reviewMode) {
+      if (lastSpokenQRef.current !== currentQ) {
+        speakText(`Question ${currentQ + 1}: ${questions[currentQ].question}`);
+        lastSpokenQRef.current = currentQ;
+      }
     }
-  }, [currentQ, voiceEnabled, reviewMode]);
+  }, [currentQ, viewMode, voiceEnabled, reviewMode, questions]);
 
-  const handleSelect = (idx) => {
-    if (answered || reviewMode) return;
-    setSelected(idx);
-    setAnswered(true);
+  const handleSelect = (qIdx, optIdx) => {
+    if (reviewMode || userAnswers[qIdx] !== undefined) return;
     
     const newAnswers = [...userAnswers];
-    newAnswers[currentQ] = idx;
+    newAnswers[qIdx] = optIdx;
     setUserAnswers(newAnswers);
+    
+    const q = questions[qIdx];
     let newScore = score;
-    if (idx === q.answer) {
+    if (optIdx === q.answer) {
       newScore = score + 1;
       setScore(newScore);
       if (voiceEnabled) {
@@ -74,32 +72,94 @@ function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled, time
     }
   };
 
+  const finishQuiz = () => {
+    setFinished(true);
+    if (!hasSaved) {
+      saveQuizToFirestore(crypto.randomUUID(), quizData, score, userAnswers);
+      setHasSaved(true);
+    }
+    const percent = Math.round((score / questions.length) * 100);
+    if (voiceEnabled) {
+      speakText(`Time is up or Quiz complete! You scored ${score} out of ${questions.length}. That is ${percent} percent.`);
+    }
+  };
+
   const handleNext = () => {
     if (currentQ < questions.length - 1) {
-      const nextQ = currentQ + 1;
-      setCurrentQ(nextQ);
-      if (reviewMode) {
-        setSelected(userAnswers[nextQ]);
-        setAnswered(true);
-      } else {
-        setSelected(null);
-        setAnswered(false);
-      }
+      setCurrentQ(currentQ + 1);
     } else {
       if (reviewMode) {
         onClose();
         return;
       }
-      setFinished(true);
-      if (!hasSaved) {
-        saveQuizToFirestore(crypto.randomUUID(), quizData, score, userAnswers);
-        setHasSaved(true);
-      }
-      const percent = Math.round((score / questions.length) * 100);
-      if (voiceEnabled) {
-        speakText(`Quiz complete! You scored ${score} out of ${questions.length}. That is ${percent} percent.`);
-      }
+      finishQuiz();
     }
+  };
+
+  const renderQuestionBlock = (q, qIdx) => {
+    const answered = userAnswers[qIdx] !== undefined;
+    const selected = userAnswers[qIdx];
+
+    return (
+      <div key={qIdx} className="flex flex-col gap-4">
+        {viewMode === "all" && (
+          <div className="font-bold text-sm text-theme-text-muted mt-4 uppercase tracking-wider">Question {qIdx + 1}</div>
+        )}
+        <div className="quiz-question flex justify-between items-start gap-4">
+          <span className="flex-1 font-semibold text-base md:text-lg text-theme-text">{q.question}</span>
+          <button
+            className="btn-secondary cursor-pointer"
+            onClick={() => speakText(`Question ${qIdx + 1}: ${q.question}`)}
+            style={{ padding: "6px 12px", fontSize: "0.85rem", borderRadius: "15px", flexShrink: 0 }}
+          >
+            <i className="fa-solid fa-volume-high"></i> Speak
+          </button>
+        </div>
+
+        {q.image && (
+          <div className="quiz-question-image rounded-2xl overflow-hidden border border-theme-border shadow-sm max-w-2xl bg-theme-card relative mt-2 mb-4">
+            <a href={q.image} target="_blank" rel="noopener noreferrer" className="block w-full">
+              <img src={q.image} alt="Question Visual Context" className="w-full h-auto object-contain max-h-80 bg-theme-sidebar/5 transition-transform duration-300 hover:scale-[1.01]" />
+              <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 opacity-0 hover:opacity-100 transition-opacity flex justify-between items-center pointer-events-none">
+                 <p className="text-xs text-white font-medium flex items-center gap-2"><i className="fa-brands fa-wikipedia-w"></i> Wikipedia Context</p>
+              </div>
+            </a>
+          </div>
+        )}
+
+        <div className="quiz-options flex flex-col gap-3">
+          {q.options.map((opt, idx) => {
+            let optClass = "quiz-option";
+            if (answered) {
+              if (idx === q.answer) optClass += " correct";
+              else if (idx === selected) optClass += " wrong";
+              else optClass += " dimmed";
+            }
+            return (
+              <div key={idx} className={optClass} onClick={() => handleSelect(qIdx, idx)}>
+                <div className="quiz-option-row">
+                  <span className="quiz-option-letter">
+                    {String.fromCharCode(65 + idx)}
+                  </span>
+                  <span className="quiz-option-text font-medium">{opt}</span>
+                  {answered && idx === q.answer && (
+                    <span className="quiz-option-badge"><i className="fa-solid fa-circle-check text-green-500"></i></span>
+                  )}
+                  {answered && idx === selected && idx !== q.answer && (
+                    <span className="quiz-option-badge"><i className="fa-solid fa-circle-xmark text-red-500"></i></span>
+                  )}
+                </div>
+                {answered && idx === q.answer && q.explanation && (
+                  <div className="quiz-option-explanation text-xs md:text-sm">
+                    <i className="fa-solid fa-lightbulb text-yellow-500 mr-1.5"></i> {q.explanation}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
 
   if (finished) {
@@ -124,7 +184,7 @@ function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled, time
           <h2 className="text-xl font-bold text-theme-text">Quiz Complete!</h2>
           <div className="quiz-score-big mt-2">{score} / {questions.length}</div>
           <div className="quiz-score-percent font-semibold">{percent}%</div>
-          <p style={{ marginTop: 10, color: "var(--text-muted)" }}>{message}</p>
+          <p style={{ marginTop: 10, color: "var(--theme-text-muted)" }}>{message}</p>
           <button className="btn-primary mt-6 cursor-pointer" onClick={onClose}>
             Try Another Quiz
           </button>
@@ -135,12 +195,30 @@ function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled, time
 
   return (
     <div className="bg-theme-card p-6 rounded-2xl border border-theme-border flex flex-col gap-6 shadow-sm">
-      <div className="quiz-header flex justify-between items-center">
-        <div>
+      <div className="quiz-header flex justify-between items-center flex-wrap gap-4">
+        <div className="flex flex-col gap-2">
           <span className="quiz-topic text-lg font-bold text-theme-text">{quizData.topic}</span>
-          <span className="quiz-progress text-xs font-semibold px-3 py-1 bg-theme-sidebar/5 rounded-full ml-3">
-            Question {currentQ + 1} of {questions.length}
-          </span>
+          <div className="flex items-center gap-3">
+            {viewMode === "single" && (
+              <span className="quiz-progress text-xs font-semibold px-3 py-1 bg-theme-sidebar/5 rounded-full">
+                Question {currentQ + 1} of {questions.length}
+              </span>
+            )}
+            <div className="flex bg-theme-sidebar/5 rounded-xl p-1 border border-theme-border">
+              <button 
+                onClick={() => setViewMode("single")} 
+                className={`px-3 py-1 text-xs font-bold rounded-lg cursor-pointer transition-all ${viewMode === "single" ? "bg-[#424754] text-white shadow-sm" : "text-theme-text-muted hover:text-theme-text"}`}
+              >
+                Single
+              </button>
+              <button 
+                onClick={() => setViewMode("all")} 
+                className={`px-3 py-1 text-xs font-bold rounded-lg cursor-pointer transition-all ${viewMode === "all" ? "bg-[#424754] text-white shadow-sm" : "text-theme-text-muted hover:text-theme-text"}`}
+              >
+                All
+              </button>
+            </div>
+          </div>
         </div>
         {timeLeft !== null && !finished && (
           <div className={`quiz-timer text-sm font-bold px-3 py-1.5 rounded-xl flex items-center gap-2 ${timeLeft < 60 ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-theme-card border border-theme-border text-theme-text'}`}>
@@ -152,73 +230,35 @@ function QuizPanel({ quizData, onClose, speakText, isTalking, voiceEnabled, time
       <div className="quiz-progress-bar">
         <div
           className="quiz-progress-fill"
-          style={{ width: `${((currentQ + (answered ? 1 : 0)) / questions.length) * 100}%` }}
+          style={{ width: `${(userAnswers.filter(a => a !== undefined).length / questions.length) * 100}%` }}
         />
       </div>
 
-      <div className="quiz-question flex justify-between items-start gap-4">
-        <span className="flex-1 font-semibold text-base md:text-lg text-theme-text">{q.question}</span>
-        <button
-          className="btn-secondary cursor-pointer"
-          onClick={() => speakText(`Question ${currentQ + 1}: ${q.question}`)}
-          style={{ padding: "6px 12px", fontSize: "0.85rem", borderRadius: "15px", flexShrink: 0 }}
-        >
-          <i className="fa-solid fa-volume-high"></i> Speak
-        </button>
-      </div>
-
-      {q.image && (
-        <div className="quiz-question-image rounded-2xl overflow-hidden border border-theme-border shadow-sm max-w-2xl bg-theme-card relative mt-2 mb-4">
-          <a href={q.image} target="_blank" rel="noopener noreferrer" className="block w-full">
-            <img src={q.image} alt="Question Visual Context" className="w-full h-auto object-contain max-h-80 bg-theme-sidebar/5 transition-transform duration-300 hover:scale-[1.01]" />
-            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 opacity-0 hover:opacity-100 transition-opacity flex justify-between items-center pointer-events-none">
-               <p className="text-xs text-white font-medium flex items-center gap-2"><i className="fa-brands fa-wikipedia-w"></i> Wikipedia Context</p>
-            </div>
-          </a>
+      {viewMode === "single" ? (
+        <>
+          {renderQuestionBlock(questions[currentQ], currentQ)}
+          {userAnswers[currentQ] !== undefined && (
+            <button className="btn-primary quiz-next-btn cursor-pointer self-end flex items-center gap-2 mt-4" onClick={handleNext}>
+              {currentQ < questions.length - 1 ? "Next Question →" : (reviewMode ? <><i className="fa-solid fa-check"></i> Finish Review</> : <><i className="fa-solid fa-trophy"></i> See Results</>)}
+            </button>
+          )}
+        </>
+      ) : (
+        <div className="flex flex-col gap-10">
+          {questions.map((q, idx) => renderQuestionBlock(q, idx))}
+          
+          <button 
+            className="btn-primary quiz-next-btn cursor-pointer self-center flex items-center gap-2 mt-4 px-8 py-3 text-lg" 
+            onClick={reviewMode ? onClose : finishQuiz}
+            disabled={!reviewMode && userAnswers.filter(a => a !== undefined).length !== questions.length}
+          >
+            {reviewMode ? <><i className="fa-solid fa-check"></i> Finish Review</> : <><i className="fa-solid fa-trophy"></i> Submit Quiz</>}
+          </button>
         </div>
-      )}
-
-      <div className="quiz-options flex flex-col gap-3">
-        {q.options.map((opt, idx) => {
-          let optClass = "quiz-option";
-          if (answered) {
-            if (idx === q.answer) optClass += " correct";
-            else if (idx === selected) optClass += " wrong";
-            else optClass += " dimmed";
-          }
-          return (
-            <div key={idx} className={optClass} onClick={() => handleSelect(idx)}>
-              <div className="quiz-option-row">
-                <span className="quiz-option-letter">
-                  {String.fromCharCode(65 + idx)}
-                </span>
-                <span className="quiz-option-text font-medium">{opt}</span>
-                {answered && idx === q.answer && (
-                  <span className="quiz-option-badge"><i className="fa-solid fa-circle-check text-green-500"></i></span>
-                )}
-                {answered && idx === selected && idx !== q.answer && (
-                  <span className="quiz-option-badge"><i className="fa-solid fa-circle-xmark text-red-500"></i></span>
-                )}
-              </div>
-              {answered && idx === q.answer && q.explanation && (
-                <div className="quiz-option-explanation text-xs md:text-sm">
-                  <i className="fa-solid fa-lightbulb text-yellow-500 mr-1.5"></i> {q.explanation}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {answered && (
-        <button className="btn-primary quiz-next-btn cursor-pointer self-end flex items-center gap-2" onClick={handleNext}>
-          {currentQ < questions.length - 1 ? "Next Question →" : (reviewMode ? <><i className="fa-solid fa-check"></i> Finish Review</> : <><i className="fa-solid fa-trophy"></i> See Results</>)}
-        </button>
       )}
     </div>
   );
 }
-
 export default function Quiz() {
   const { t } = useLanguage();
   const [instructions, setInstructions] = useState("");
