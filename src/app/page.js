@@ -314,6 +314,15 @@ If no image makes sense, use a general relevant keyword.`;
     }
   };
 
+  const stopAudio = () => {
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current = null;
+    }
+    window.speechSynthesis.cancel();
+    setIsTalking(false);
+  };
+
   const clearChat = () => {
     setConversationHistory([
       {
@@ -549,6 +558,16 @@ If no image makes sense, use a general relevant keyword.`;
               />
               
               <div className="flex items-center gap-1 pr-1">
+                {isTalking && (
+                  <button
+                    onClick={stopAudio}
+                    title="Stop Speaking"
+                    className="w-9 h-9 flex items-center justify-center transition-colors rounded-full cursor-pointer text-red-500 hover:bg-red-500/10 animate-pulse"
+                  >
+                    <i className="fa-solid fa-circle-stop"></i>
+                  </button>
+                )}
+                
                 <button
                   onClick={handleMicClick}
                   className={`w-9 h-9 rounded-full flex items-center justify-center transition-all cursor-pointer ${
